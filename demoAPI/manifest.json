@@ -1,5 +1,5 @@
 {
-  "container": "buildpack-deps:latest",
+  "container": "node:18-alpine",
   "install": "echo 'No installation needed for buildpack Bash.'",
   "update": "",
   "run": "bash",
