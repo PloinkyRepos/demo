@@ -3,6 +3,6 @@
   "install": "echo 'No installation needed for buildpack Bash.'",
   "update": "",
   "run": "bash",
-   "runTask":"node /code/demoApi.js'"
+   "runTask":"node /code/demoApi.js",
   "about": "Bash shell environment. Run any bash commands and scripts"
 }
