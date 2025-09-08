@@ -2,7 +2,7 @@
   "container": "node:18-alpine",
   "install": "echo 'No installation needed for buildpack Bash.'",
   "update": "",
-  "run": "bash",
-   "runTask":"node /code/demoApi.js",
+  "cli": "bash",
+  "agent":"/agent/AgentServer.sh 'node /code/demoApi.js'",
   "about": "Bash shell environment. Run any bash commands and scripts"
 }
