@@ -1,8 +1,8 @@
 {
   "container": "buildpack-deps:latest",
-  "install": "echo 'No installation needed for buildpack Bash.'",
+  "install": "echo 'No installation needed.'",
   "update": "",
-  "run": "bash",
-   "runTask":"echo 'Success! Used by tests only'",
-  "about": "Bash shell environment. Run any bash commands and scripts"
+  "cli": "bash",
+  "agent":"echo 'Success!",
+  "about": "Demo agent for providing static files"
 }
