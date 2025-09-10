@@ -282,22 +282,27 @@
             runButton.disabled = true;
 
             const requestData = {
-                task: 'montyHall',
+                command: 'montyHall',
                 iterations: iterations
             };
+
+            // Encode JSON to base64
+            const jsonString = JSON.stringify(requestData);
+            const base64Data = btoa(jsonString);
 
             const apiUrl = 'http://localhost:8088/apis/simulator/';
             
             console.log('Making request to:', apiUrl);
-            console.log('Request data:', requestData);
+            console.log('Original request data:', requestData);
+            console.log('Base64 encoded data:', base64Data);
 
             try {
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'text/plain',
                     },
-                    body: JSON.stringify(requestData)
+                    body: base64Data
                 });
 
                 console.log('Response status:', response.status);

@@ -229,24 +229,43 @@ function main() {
     const input = process.argv[2];
     
     if (!input) {
-        console.error('Error: No input provided');
-        process.exit(1);
+        // Default to 10 iterations if no input
+        const results = runMontyHallSimulation(10);
+        const html = generateHTML(results);
+        console.log(html);
+        return;
     }
     
     try {
-        const data = JSON.parse(input);
+        // Decode base64 input
+        const decodedInput = Buffer.from(input, 'base64').toString('utf-8');
+        const data = JSON.parse(decodedInput);
         
-        if (!data.iterations || typeof data.iterations !== 'number') {
-            throw new Error('Invalid iterations parameter');
+        // Check for iterations parameter, default to 10 if invalid
+        let iterations = 10;
+        let message = '';
+        
+        if (data.iterations && typeof data.iterations === 'number' && data.iterations > 0) {
+            iterations = data.iterations;
+        } else {
+            message = '<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 10px; margin-bottom: 20px; color: #92400e;">⚠️ Invalid parameters received. Using default of 10 iterations.</div>';
         }
         
-        const results = runMontyHallSimulation(data.iterations);
-        const html = generateHTML(results);
+        const results = runMontyHallSimulation(iterations);
+        let html = generateHTML(results);
+        
+        // Prepend warning message if parameters were invalid
+        if (message) {
+            html = message + html;
+        }
         
         console.log(html);
     } catch (error) {
-        console.error(`Error: ${error.message}`);
-        process.exit(1);
+        // If decoding fails, run with default 10 iterations
+        const results = runMontyHallSimulation(10);
+        let html = generateHTML(results);
+        html = '<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 10px; margin-bottom: 20px; color: #92400e;">⚠️ Could not decode parameters. Using default of 10 iterations.</div>' + html;
+        console.log(html);
     }
 }
 
