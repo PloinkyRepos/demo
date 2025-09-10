@@ -1,8 +1,0 @@
-{
-  "container": "node:18-alpine",
-  "install": "echo 'No installation needed'",
-  "update": "",
-  "cli": "bash",
-  "agent":"/Agent/AgentServer.sh 'node /code/demoApi.js'",
-  "about": "Bash shell environment. Run any bash commands and scripts"
-}
