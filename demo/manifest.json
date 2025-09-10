@@ -2,6 +2,6 @@
   "container": "buildpack-deps:latest",
   "install": "echo 'No installation needed.'",
   "update": "",
-  "cli": "bash"
+  "cli": "bash",
   "about": "Demo agent for providing static files"
 }
