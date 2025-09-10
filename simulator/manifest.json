@@ -4,5 +4,5 @@
   "update": "",
   "cli": "bash",
   "agent":"/Agent/AgentServer.sh 'node /code/demoApi.js'",
-  "about": "Bash shell environment. Run any bash commands and scripts"
+  "about": "Demo agent, enable an API for a Monty Hall Simulator"
 }
