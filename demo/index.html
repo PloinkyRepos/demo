@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -224,17 +224,17 @@
 <body>
     <div class="container">
         <h1>🚪 Monty Hall Problem</h1>
-        <p class="subtitle">Simulare Demonstrativă</p>
+        <p class="subtitle">Demonstration Simulator</p>
         
         <div class="description">
-            <p>Problema Monty Hall este un paradox probabilistic bazat pe un show TV. 
-            Aveți 3 uși: în spatele uneia este un premiu, în spatele celorlalte două sunt capre. 
-            După ce alegeți o ușă, moderatorul (care știe ce se află în spatele fiecărei uși) 
-            deschide o altă ușă cu o capră. Întrebarea este: ar trebui să schimbați alegerea?</p>
+            <p>The Monty Hall problem is a probability paradox based on a TV game show. 
+            You have 3 doors: behind one is a prize, behind the other two are goats. 
+            After you choose a door, the host (who knows what's behind each door) 
+            opens another door with a goat. The question is: should you switch your choice?</p>
         </div>
 
         <div class="form-group">
-            <label for="iterations">Număr de iterații:</label>
+            <label for="iterations">Number of iterations:</label>
             <div class="input-wrapper">
                 <input type="number" id="iterations" min="1" max="100000" value="10">
                 <span class="iterations-display" id="iterationsDisplay">10</span>
@@ -247,7 +247,7 @@
 
         <div class="loading" id="loading">
             <span class="spinner"></span>
-            <span>Simulare în curs...</span>
+            <span>Simulation in progress...</span>
         </div>
     </div>
 
@@ -274,36 +274,47 @@
             const iterations = parseInt(iterationsInput.value);
             
             if (iterations < 1) {
-                alert('Numărul de iterații trebuie să fie cel puțin 1');
+                alert('Number of iterations must be at least 1');
                 return;
             }
 
             loadingDiv.classList.add('active');
             runButton.disabled = true;
 
+            const requestData = {
+                task: 'montyHall',
+                iterations: iterations
+            };
+
+            const apiUrl = 'http://localhost:8088/apis/simulator/';
+            
+            console.log('Making request to:', apiUrl);
+            console.log('Request data:', requestData);
+
             try {
-                const response = await fetch('/apis/simulator/', {
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        task: 'montyHall',
-                        nrIteratii: iterations
-                    })
+                    body: JSON.stringify(requestData)
                 });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 const html = await response.text();
+                console.log('Response received, length:', html.length);
                 showResult(html);
             } catch (error) {
                 console.error('Error:', error);
                 showResult(`<div style="color: red;">
-                    <h2>Eroare!</h2>
-                    <p>A apărut o eroare la rularea simulării: ${error.message}</p>
+                    <h2>Error!</h2>
+                    <p>An error occurred while running the simulation: ${error.message}</p>
                 </div>`);
             } finally {
                 loadingDiv.classList.remove('active');

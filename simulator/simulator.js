@@ -155,62 +155,62 @@ function generateHTML(results) {
     
     <div class="simulation-results">
         <div class="result-header">
-            <h2>🎰 Rezultatele Simulării Monty Hall</h2>
+            <h2>🎰 Monty Hall Simulation Results</h2>
             <div class="iterations-info">
-                <strong>${results.iterations.toLocaleString()}</strong> iterații completate
+                <strong>${results.iterations.toLocaleString()}</strong> iterations completed
             </div>
         </div>
         
         <div class="results-grid">
             <div class="result-card switch-card">
-                <div class="strategy-label">🔄 Strategia: SCHIMBĂ</div>
+                <div class="strategy-label">🔄 Strategy: SWITCH</div>
                 <div class="win-rate">${results.switchWinRate}%</div>
-                <div class="wins-count">${results.winsWithSwitch.toLocaleString()} câștiguri</div>
+                <div class="wins-count">${results.winsWithSwitch.toLocaleString()} wins</div>
             </div>
             
             <div class="result-card stay-card">
-                <div class="strategy-label">🎯 Strategia: PĂSTREAZĂ</div>
+                <div class="strategy-label">🎯 Strategy: STAY</div>
                 <div class="win-rate">${results.stayWinRate}%</div>
-                <div class="wins-count">${results.winsWithoutSwitch.toLocaleString()} câștiguri</div>
+                <div class="wins-count">${results.winsWithoutSwitch.toLocaleString()} wins</div>
             </div>
         </div>
         
         <div class="conclusion">
-            <h3>📊 Concluzie</h3>
+            <h3>📊 Conclusion</h3>
             <p>
-                După ${results.iterations.toLocaleString()} simulări, strategia de a <span class="advantage">SCHIMBA alegerea</span> 
-                a avut o rată de succes cu <span class="advantage">${switchAdvantage}%</span> mai mare decât strategia 
-                de a păstra alegerea inițială.
+                After ${results.iterations.toLocaleString()} simulations, the strategy of <span class="advantage">SWITCHING</span> 
+                had a success rate <span class="advantage">${switchAdvantage}%</span> higher than the strategy 
+                of keeping the initial choice.
             </p>
             <p>
-                Acest lucru confirmă paradoxul Monty Hall: șansele de câștig se dublează când schimbați ușa!
+                This confirms the Monty Hall paradox: your chances of winning double when you switch doors!
                 <span class="emoji">🚪➡️🚪</span>
             </p>
         </div>
         
         <div class="theoretical-note">
-            <h4>📚 Notă Teoretică</h4>
+            <h4>📚 Theoretical Note</h4>
             <p>
-                În teorie, probabilitățile sunt:
+                In theory, the probabilities are:
             </p>
             <table class="stats-table">
                 <thead>
                     <tr>
-                        <th>Strategie</th>
-                        <th>Probabilitate Teoretică</th>
-                        <th>Rezultat Simulare</th>
-                        <th>Diferență</th>
+                        <th>Strategy</th>
+                        <th>Theoretical Probability</th>
+                        <th>Simulation Result</th>
+                        <th>Difference</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Schimbă</td>
+                        <td>Switch</td>
                         <td>${theoreticalSwitch}%</td>
                         <td>${results.switchWinRate}%</td>
                         <td>${(Math.abs(results.switchWinRate - theoreticalSwitch)).toFixed(2)}%</td>
                     </tr>
                     <tr>
-                        <td>Păstrează</td>
+                        <td>Stay</td>
                         <td>${theoreticalStay}%</td>
                         <td>${results.stayWinRate}%</td>
                         <td>${(Math.abs(results.stayWinRate - theoreticalStay)).toFixed(2)}%</td>
@@ -218,7 +218,7 @@ function generateHTML(results) {
                 </tbody>
             </table>
             <p style="margin-top: 10px;">
-                Cu cât rulați mai multe iterații, cu atât rezultatele se apropie mai mult de valorile teoretice!
+                The more iterations you run, the closer the results get to the theoretical values!
             </p>
         </div>
     </div>
@@ -236,11 +236,11 @@ function main() {
     try {
         const data = JSON.parse(input);
         
-        if (!data.nrIteratii || typeof data.nrIteratii !== 'number') {
-            throw new Error('Invalid nrIteratii parameter');
+        if (!data.iterations || typeof data.iterations !== 'number') {
+            throw new Error('Invalid iterations parameter');
         }
         
-        const results = runMontyHallSimulation(data.nrIteratii);
+        const results = runMontyHallSimulation(data.iterations);
         const html = generateHTML(results);
         
         console.log(html);
