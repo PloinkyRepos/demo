@@ -286,11 +286,15 @@
                 iterations: iterations
             };
 
+<<<<<<< HEAD
             // Encode JSON to base64
             const jsonString = JSON.stringify(requestData);
             const base64Data = btoa(jsonString);
 
             const apiUrl = 'http://localhost:8088/apis/simulator/';
+=======
+            const apiUrl = 'http://localhost:8088/apis/simulation/';
+>>>>>>> b6f1872ddd3f7bd0e30fa22417ea86b23dd31c95
             
             console.log('Making request to:', apiUrl);
             console.log('Original request data:', requestData);
