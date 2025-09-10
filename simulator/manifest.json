@@ -3,6 +3,6 @@
   "install": "echo 'No installation needed'",
   "update": "",
   "cli": "bash",
-  "agent":"/Agent/AgentServer.sh 'node /code/demoApi.js'",
-  "about": "Demo agent, enable an API for a Monty Hall Simulator"
+  "agent": "/Agent/AgentServer.sh 'node /code/simulator.js'",
+  "about": "Demo agent, enables an API for a Monty Hall Simulator"
 }
