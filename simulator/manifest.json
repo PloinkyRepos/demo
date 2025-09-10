@@ -2,7 +2,7 @@
   "container": "node:18-alpine",
   "install": "echo 'No installation needed'",
   "update": "",
-  "cli": "/bin/bash",
+  "cli": "/bin/sh",
   "agent": "/Agent/AgentServer.sh 'node /code/simulator.js'",
   "about": "Demo agent, enables an API for a Monty Hall Simulator"
 }
