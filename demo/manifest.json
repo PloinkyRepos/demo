@@ -2,6 +2,6 @@
   "container": "node:18-alpine",
   "install": "echo 'No installation needed.'",
   "update": "",
-  "cli": "bash",
+  "cli": "/bin/bash",
   "about": "Demo agent for providing static files"
 }
