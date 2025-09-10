@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monty Hall Problem - Simulator</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E🎲%3C/text%3E%3C/svg%3E">
     <style>
         * {
             margin: 0;
@@ -281,32 +282,17 @@
             loadingDiv.classList.add('active');
             runButton.disabled = true;
 
-            const requestData = {
-                command: 'montyHall',
-                iterations: iterations
-            };
-
-<<<<<<< HEAD
-            // Encode JSON to base64
-            const jsonString = JSON.stringify(requestData);
-            const base64Data = btoa(jsonString);
-
-            const apiUrl = 'http://localhost:8088/apis/simulator/';
-=======
-            const apiUrl = 'http://localhost:8088/apis/simulation/';
->>>>>>> b6f1872ddd3f7bd0e30fa22417ea86b23dd31c95
+            const requestData = { task: 'montyHall', iterations };
+            const apiUrl = '/apis/simulation';
             
             console.log('Making request to:', apiUrl);
             console.log('Original request data:', requestData);
-            console.log('Base64 encoded data:', base64Data);
 
             try {
                 const response = await fetch(apiUrl, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain',
-                    },
-                    body: base64Data
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestData)
                 });
 
                 console.log('Response status:', response.status);
@@ -316,8 +302,9 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const html = await response.text();
-                console.log('Response received, length:', html.length);
+                const data = await response.json();
+                console.log('Response received:', data);
+                const html = (data && (data.html || data.stdout)) || '<p>No content.</p>';
                 showResult(html);
             } catch (error) {
                 console.error('Error:', error);
