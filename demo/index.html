@@ -246,9 +246,14 @@
             </div>
         </div>
 
-        <button id="runSimulation" onclick="runSimulation()">
-            🎲 Run Simulation
-        </button>
+        <div style="display: flex; gap: 10px;">
+            <button id="runSimulation" onclick="runSimulation()" style="flex: 1;">
+                🎲 Run Simulation
+            </button>
+            <button id="selfCall" onclick="selfCall()" style="flex: 1;">
+                🔄 Self Call
+            </button>
+        </div>
 
         <div class="loading" id="loading">
             <span class="spinner"></span>
@@ -274,6 +279,54 @@
         iterationsInput.addEventListener('input', function() {
             iterationsDisplay.textContent = this.value;
         });
+
+        async function selfCall() {
+            loadingDiv.classList.add('active');
+            const selfCallButton = document.getElementById('selfCall');
+            selfCallButton.disabled = true;
+
+            const apiUrl = '/apis/demo';
+            
+            console.log('Making self call to:', apiUrl);
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                console.log('Self call response status:', response.status);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Self call response received:', data);
+                
+                const html = `
+                    <div style="padding: 20px;">
+                        <h2 style="color: #667eea; margin-bottom: 15px;">🔄 Self Call Result</h2>
+                        <div style="background: #f7f7f7; padding: 15px; border-radius: 8px;">
+                            <pre style="white-space: pre-wrap; word-wrap: break-word;">${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                        <p style="margin-top: 15px; color: #666; font-size: 0.9em;">
+                            Response from the "demo" agent
+                        </p>
+                    </div>
+                `;
+                showResult(html);
+            } catch (error) {
+                console.error('Self call error:', error);
+                showResult(`<div style="color: red;">
+                    <h2>Error!</h2>
+                    <p>An error occurred during self call: ${error.message}</p>
+                </div>`);
+            } finally {
+                loadingDiv.classList.remove('active');
+                selfCallButton.disabled = false;
+            }
+        }
 
         async function runSimulation() {
             const iterations = parseInt(iterationsInput.value);
