@@ -3,5 +3,7 @@
   "install": "echo 'No installation needed.'",
   "update": "",
   "cli": "/bin/sh",
-  "about": "Demo agent for providing static files"
+  "about": "Demo agent for providing static files",
+  "enable" : ["simulator"],
+  "repos" : {"vibe1":"https://github.com/PloinkyRepos/vibe.git", "security1": "https://github.com/PloinkyRepos/security.git"}
 }
