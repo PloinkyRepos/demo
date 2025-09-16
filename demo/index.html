@@ -3,398 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monty Hall Problem - Simulator</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E🎲%3C/text%3E%3C/svg%3E">
+    <title>Welcome to Ploinky's Demo</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            height: 100vh;
+            margin: 0;
         }
-
         .container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            width: 100%;
+            text-align: center;
+            background-color: #ffffff;
+            padding: 50px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-
         h1 {
             color: #333;
-            margin-bottom: 10px;
-            text-align: center;
-            font-size: 1.75em;
+            font-size: 2.5em;
         }
-
-        .subtitle {
+        p {
             color: #666;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 1em;
+            font-size: 1.2em;
+            margin-top: 10px;
         }
-
-        .description {
-            background: #f7f7f7;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            color: #555;
-            line-height: 1.6;
-            font-size: 0.95em;
+        .links {
+            margin-top: 30px;
         }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 10px;
-            color: #333;
-            font-weight: 600;
-            font-size: 1em;
-        }
-
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        input[type="number"] {
-            flex: 1;
-            padding: 10px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1em;
-            transition: all 0.3s ease;
-        }
-
-        input[type="number"]:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .iterations-display {
-            background: #667eea;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-weight: bold;
-            min-width: 80px;
-            text-align: center;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
+        a {
+            color: #007bff;
+            text-decoration: none;
             font-size: 1.1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            margin: 0 15px;
+            transition: color 0.3s;
         }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            margin-top: 20px;
-            color: #667eea;
-            font-weight: 600;
-        }
-
-        .loading.active {
-            display: block;
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(102, 126, 234, 0.3);
-            border-top-color: #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal.active {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .modal-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-            width: 90%;
-            animation: slideIn 0.3s ease;
-            position: relative;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .close:hover {
-            color: #333;
-        }
-
-        .result-content {
-            margin-top: 20px;
+        a:hover {
+            color: #0056b3;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🚪 Monty Hall Problem</h1>
-        <p class="subtitle">Demonstration Simulator</p>
-        <p style="color: #888; font-size: 0.85em; margin-top: -20px; margin-bottom: 20px; text-align: center;">
-            This interface is loaded from the "demo" agent and calls the "simulator" agent for calculations
-        </p>
-        
-        <div class="description">
-            <p>The Monty Hall problem is a probability paradox based on a TV game show. 
-            You have 3 doors: behind one is a prize, behind the other two are goats. 
-            After you choose a door, the host (who knows what's behind each door) 
-            opens another door with a goat. The question is: should you switch your choice?</p>
-        </div>
-
-        <div class="form-group">
-            <label for="iterations">Number of iterations:</label>
-            <div class="input-wrapper">
-                <input type="number" id="iterations" min="1" max="100000" value="10">
-                <span class="iterations-display" id="iterationsDisplay">10</span>
-            </div>
-        </div>
-
-        <div style="display: flex; gap: 10px;">
-            <button id="runSimulation" onclick="runSimulation()" style="flex: 1;">
-                🎲 Run Simulation
-            </button>
-            <button id="selfCall" onclick="selfCall()" style="flex: 1;">
-                🔄 Self Call
-            </button>
-        </div>
-
-        <div class="loading" id="loading">
-            <span class="spinner"></span>
-            <span>Simulation in progress...</span>
+        <h1>Welcome to Ploinky's Demo Page</h1>
+        <p>This is a demonstration of various web capabilities.</p>
+        <div class="links">
+            <a href="http://www.ploinky.com" target="_blank">Visit Ploinky.com</a>
+            <a href="demo.html">Monty Hall Demo</a>
         </div>
     </div>
-
-    <div id="resultModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <div id="resultContent" class="result-content"></div>
-        </div>
-    </div>
-
-    <script>
-        const iterationsInput = document.getElementById('iterations');
-        const iterationsDisplay = document.getElementById('iterationsDisplay');
-        const loadingDiv = document.getElementById('loading');
-        const runButton = document.getElementById('runSimulation');
-        const modal = document.getElementById('resultModal');
-        const resultContent = document.getElementById('resultContent');
-
-        iterationsInput.addEventListener('input', function() {
-            iterationsDisplay.textContent = this.value;
-        });
-
-        async function selfCall() {
-            loadingDiv.classList.add('active');
-            const selfCallButton = document.getElementById('selfCall');
-            selfCallButton.disabled = true;
-
-            const apiUrl = '/apis/demo';
-            
-            console.log('Making self call to:', apiUrl);
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-
-                console.log('Self call response status:', response.status);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                console.log('Self call response received:', data);
-                
-                const html = `
-                    <div style="padding: 20px;">
-                        <h2 style="color: #667eea; margin-bottom: 15px;">🔄 Self Call Result</h2>
-                        <div style="background: #f7f7f7; padding: 15px; border-radius: 8px;">
-                            <pre style="white-space: pre-wrap; word-wrap: break-word;">${JSON.stringify(data, null, 2)}</pre>
-                        </div>
-                        <p style="margin-top: 15px; color: #666; font-size: 0.9em;">
-                            Response from the "demo" agent
-                        </p>
-                    </div>
-                `;
-                showResult(html);
-            } catch (error) {
-                console.error('Self call error:', error);
-                showResult(`<div style="color: red;">
-                    <h2>Error!</h2>
-                    <p>An error occurred during self call: ${error.message}</p>
-                </div>`);
-            } finally {
-                loadingDiv.classList.remove('active');
-                selfCallButton.disabled = false;
-            }
-        }
-
-        async function runSimulation() {
-            const iterations = parseInt(iterationsInput.value);
-            
-            if (iterations < 1) {
-                alert('Number of iterations must be at least 1');
-                return;
-            }
-
-            loadingDiv.classList.add('active');
-            runButton.disabled = true;
-
-            const requestData = { task: 'montyHall', iterations };
-            const apiUrl = '/apis/simulator';
-            
-            console.log('Making request to:', apiUrl);
-            console.log('Original request data:', requestData);
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(requestData)
-                });
-
-                console.log('Response status:', response.status);
-                console.log('Response headers:', response.headers);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                console.log('Response received:', data);
-                const html = (data && (data.html || data.stdout)) || '<p>No content.</p>';
-                showResult(html);
-            } catch (error) {
-                console.error('Error:', error);
-                showResult(`<div style="color: red;">
-                    <h2>Error!</h2>
-                    <p>An error occurred while running the simulation: ${error.message}</p>
-                </div>`);
-            } finally {
-                loadingDiv.classList.remove('active');
-                runButton.disabled = false;
-            }
-        }
-
-        function showResult(html) {
-            resultContent.innerHTML = html;
-            modal.classList.add('active');
-        }
-
-        function closeModal() {
-            modal.classList.remove('active');
-        }
-
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                closeModal();
-            }
-        }
-
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeModal();
-            }
-        });
-    </script>
 </body>
 </html>
