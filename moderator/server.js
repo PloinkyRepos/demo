@@ -87,24 +87,26 @@ const server = http.createServer((req, res) => {
                     return;
                 }
             }
+
+            if (lowerCaseMessage.startsWith('simulator')) {
+                const simulatorArgs = message.substring('simulator'.length).trim();
+                const responsePayload = {
+                    command: 'redirect',
+                    to: 'simulator',
+                    message: simulatorArgs
+                };
+                res.writeHead(200);
+                res.end(JSON.stringify(responsePayload));
+                return;
+            }
         }
 
-        let responsePayload;
-
-        if (command === 'simulator') {
-            responsePayload = {
-                command: 'redirect',
-                to: 'simulator',
-                message: message
-            };
-        } else {
-            responsePayload = {
-                from: from,
-                to: 'all',
-                message: message,
-                command: command
-            };
-        }
+        let responsePayload = {
+            from: from,
+            to: 'all',
+            message: message,
+            command: command
+        };
 
         res.writeHead(200);
         res.end(JSON.stringify(responsePayload));
