@@ -3,6 +3,9 @@ const url = require('url');
 const fs = require('fs');
 const path = require('path');
 
+let speakerQueue = [];
+let currentSpeaker = null;
+
 const forbiddenWords = [
     'fuck', 'bitch', 'shit', 'asshole', 'cunt', 'dick', 'pussy',
     'motherfucker', 'ass', 'cock', 'slut', 'whore', 'damn'
@@ -58,7 +61,6 @@ function logCommand(params) {
 
 const server = http.createServer((req, res) => {
     const handleRequest = (params) => {
-        logCommand(params);
         const { from, to, message, command } = params;
 
         res.setHeader('Content-Type', 'application/json');
@@ -72,6 +74,76 @@ const server = http.createServer((req, res) => {
             return;
         }
 
+        if (command === 'wantToSpeak') {
+            if (from && !speakerQueue.includes(from) && from !== currentSpeaker) {
+                speakerQueue.push(from);
+                logCommand({ request: params, decision: { command: "queueUser", user: from } });
+            }
+
+            if (currentSpeaker === null && speakerQueue.length > 0) {
+                currentSpeaker = speakerQueue.shift();
+                const responsePayload = {
+                    from: "moderator",
+                    to: "all",
+                    command: "speak",
+                    who: currentSpeaker,
+                    waiting: speakerQueue
+                };
+                logCommand({ request: params, decision: { command: "speak", who: currentSpeaker, waiting: speakerQueue.length } });
+                res.writeHead(200);
+                res.end(JSON.stringify(responsePayload));
+            } else {
+                // Acknowledge the request and send current status
+                const responsePayload = {
+                    from: "moderator",
+                    to: from,
+                    command: "queued",
+                    who: currentSpeaker,
+                    waiting: speakerQueue
+                };
+                logCommand({ request: params, decision: { command: "informQueued", user: from } });
+                res.writeHead(200);
+                res.end(JSON.stringify(responsePayload));
+            }
+            return;
+        }
+
+        if (command === 'endSpeak') {
+            if (from === currentSpeaker) {
+                if (speakerQueue.length > 0) {
+                    currentSpeaker = speakerQueue.shift();
+                    const responsePayload = {
+                        from: "moderator",
+                        to: "all",
+                        command: "speak",
+                        who: currentSpeaker,
+                        waiting: speakerQueue
+                    };
+                    logCommand({ request: params, decision: { command: "speak", who: currentSpeaker, waiting: speakerQueue.length } });
+                    res.writeHead(200);
+                    res.end(JSON.stringify(responsePayload));
+                } else {
+                    currentSpeaker = null;
+                    const responsePayload = {
+                        from: "moderator",
+                        to: "all",
+                        command: "speak",
+                        who: "none",
+                        waiting: []
+                    };
+                    logCommand({ request: params, decision: { command: "speak", who: "none" } });
+                    res.writeHead(200);
+                    res.end(JSON.stringify(responsePayload));
+                }
+            } else {
+                // A non-speaker tried to end the speech. Ignore the request.
+                logCommand({ request: params, decision: { command: "ignored", reason: "endSpeak from non-speaker" } });
+                res.writeHead(204); // 204 No Content signals the request was received and handled.
+                res.end();
+            }
+            return;
+        }
+
         if (message) {
             const lowerCaseMessage = message.toLowerCase();
             for (const word of forbiddenWords) {
@@ -82,6 +154,7 @@ const server = http.createServer((req, res) => {
                         from: "system",
                         message: "Forbidden message"
                     };
+                    logCommand({ request: params, decision: { command: "forbidden" } });
                     res.writeHead(403);
                     res.end(JSON.stringify(responsePayload));
                     return;
@@ -95,6 +168,7 @@ const server = http.createServer((req, res) => {
                     to: 'simulator',
                     message: simulatorArgs
                 };
+                logCommand({ request: params, decision: { command: "redirect", to: "simulator" } });
                 res.writeHead(200);
                 res.end(JSON.stringify(responsePayload));
                 return;
@@ -108,6 +182,7 @@ const server = http.createServer((req, res) => {
             command: command
         };
 
+        logCommand({ request: params, decision: { command: "broadcast" } });
         res.writeHead(200);
         res.end(JSON.stringify(responsePayload));
     };
