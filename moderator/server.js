@@ -61,7 +61,7 @@ function logCommand(params) {
 
 const server = http.createServer((req, res) => {
     const handleRequest = (params) => {
-        const { from, to, message, command } = params;
+        const { from, to, message, command, text } = params;
 
         res.setHeader('Content-Type', 'application/json');
         res.setHeader('Access-Control-Allow-Origin', '*'); // Allow requests from any origin
@@ -144,15 +144,16 @@ const server = http.createServer((req, res) => {
             return;
         }
 
-        if (message) {
-            const lowerCaseMessage = message.toLowerCase();
+        // Forbidden word check on 'text' field
+        if (text) {
+            const lowerCaseText = text.toLowerCase();
             for (const word of forbiddenWords) {
-                if (lowerCaseMessage.includes(word)) {
+                if (lowerCaseText.includes(word)) {
                     const responsePayload = {
                         command: "forbidden",
                         to: from,
                         from: "system",
-                        message: "Forbidden message"
+                        message: "Forbidden message" // Generic message
                     };
                     logCommand({ request: params, decision: { command: "forbidden" } });
                     res.writeHead(403);
@@ -160,27 +161,34 @@ const server = http.createServer((req, res) => {
                     return;
                 }
             }
-
-            if (lowerCaseMessage.startsWith('simulator')) {
-                const simulatorArgs = message.substring('simulator'.length).trim();
-                const responsePayload = {
-                    command: 'redirect',
-                    to: 'simulator',
-                    message: simulatorArgs
-                };
-                logCommand({ request: params, decision: { command: "redirect", to: "simulator" } });
-                res.writeHead(200);
-                res.end(JSON.stringify(responsePayload));
-                return;
-            }
         }
 
-        let responsePayload = {
+        // Simulator check on 'message' field
+        if (message && message.toLowerCase().startsWith('simulator')) {
+            const simulatorArgs = message.substring('simulator'.length).trim();
+            const responsePayload = {
+                command: 'redirect',
+                to: 'simulator',
+                message: simulatorArgs
+            };
+            logCommand({ request: params, decision: { command: "redirect", to: "simulator" } });
+            res.writeHead(200);
+            res.end(JSON.stringify(responsePayload));
+            return;
+        }
+
+        // Default broadcast for all other messages
+        const responsePayload = {
             from: from,
             to: 'all',
-            message: message,
-            command: command
+            command: command,
         };
+        if (message) {
+            responsePayload.message = message;
+        }
+        if (text) {
+            responsePayload.text = text;
+        }
 
         logCommand({ request: params, decision: { command: "broadcast" } });
         res.writeHead(200);
