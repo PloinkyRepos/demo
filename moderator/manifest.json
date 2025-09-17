@@ -4,5 +4,5 @@
   "update": "",
   "cli": "/bin/sh",
   "agent": "node /code/server.js",
-  "about": "Demo agent, enables an API for a Monty Hall Simulator"
+  "about": "Example of moderator agent for webmeet"
 }
