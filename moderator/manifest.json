@@ -4,5 +4,5 @@
   "update": "",
   "cli": "/bin/sh",
   "agent": "node /code/server.js",
-  "about": "Example of moderator agent for webmeet"
+  "about": "Example of moderator agent"
 }
