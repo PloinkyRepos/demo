@@ -4,6 +4,7 @@
   "update": "",
   "cli": "/bin/sh",
   "about": "Demo agent for providing static files",
-  "enable" : ["simulator"],
-  "repos" : {"vibe1":"https://github.com/PloinkyRepos/vibe.git"}
+  "enable" : ["simulator", "moderator"],
+  "repos" : {"vibe1":"https://github.com/PloinkyRepos/vibe.git",
+  "webmeet":"https://github.com/PloinkyRepos/webmeet.git"}
 }
