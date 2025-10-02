@@ -1,0 +1,40 @@
+ {
+    "tools": [
+      {
+        "name": "list_things",
+        "title": "List Things",
+        "description": "Enumerate items in a category",
+        "command": "node scripts/list-things.js",
+        "input": {
+          "type": "object",
+          "properties": {
+            "category": {
+              "type": "string",
+              "description": "fruits | animals | colors"
+            }
+          },
+          "required": ["category"],
+          "additionalProperties": false
+        }
+      }
+    ],
+    "resources": [
+      {
+        "name": "health",
+        "uri": "health://status",
+        "description": "Service health state",
+        "mimeType": "application/json",
+        "command": "node scripts/health.js"
+      }
+    ],
+    "prompts": [
+      {
+        "name": "summarize",
+        "description": "Short summary",
+        "messages": [
+          { "role": "system", "content": "You are a concise analyst." },
+          { "role": "user", "content": "${input}" }
+        ]
+      }
+    ]
+  }
