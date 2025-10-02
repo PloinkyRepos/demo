@@ -1,40 +1,72 @@
- {
-    "tools": [
-      {
-        "name": "list_things",
-        "title": "List Things",
-        "description": "Enumerate items in a category",
-        "command": "node scripts/list-things.js",
-        "input": {
-          "type": "object",
-          "properties": {
-            "category": {
-              "type": "string",
-              "description": "fruits | animals | colors"
-            }
-          },
-          "required": ["category"],
-          "additionalProperties": false
+{
+  "tools": [
+    {
+      "name": "echo_script",
+      "title": "Echo Message",
+      "description": "Repeat back the provided message parameter.",
+      "command": ["/bin/bash", "/code/tests/echo_script.sh"]
+    },
+    {
+      "name": "random_probability",
+      "title": "Random Probability Sampler",
+      "description": "Generate a random probability estimate; optionally provide a sample count.",
+      "command": ["/bin/bash", "/code/tests/compute_probabilty.sh"]
+    }
+  ],
+  "resources": [
+    {
+      "name": "echo_tool_overview",
+      "uri": "text://echo-tool/overview",
+      "title": "Echo Tool Overview",
+      "description": "Quick reference for the echo_script tool arguments.",
+      "command": [
+        "/bin/sh",
+        "-lc",
+        "printf 'Tool echo_script repeats the message you provide.\\nInvoke with arguments: {\"message\": \"Hello\"}.\\n'"
+      ],
+      "mimeType": "text/plain"
+    },
+    {
+      "name": "probability_tool_overview",
+      "uri": "text://random-probability/overview",
+      "title": "Random Probability Overview",
+      "description": "Explains how random_probability samples values.",
+      "command": [
+        "/bin/sh",
+        "-lc",
+        "printf 'Tool random_probability computes an averaged random value in [0,1].\\nOptional argument samples controls the Monte Carlo sample size.\\n'"
+      ],
+      "mimeType": "text/plain"
+    }
+  ],
+  "prompts": [
+    {
+      "name": "suggest_echo_usage",
+      "description": "Guide the user through using the echo tool.",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You help operators test the demo echo tool."
+        },
+        {
+          "role": "user",
+          "content": "Demonstrate an echo by calling echo_script with message=\"Hello demo\"."
         }
-      }
-    ],
-    "resources": [
-      {
-        "name": "health",
-        "uri": "health://status",
-        "description": "Service health state",
-        "mimeType": "application/json",
-        "command": "node scripts/health.js"
-      }
-    ],
-    "prompts": [
-      {
-        "name": "summarize",
-        "description": "Short summary",
-        "messages": [
-          { "role": "system", "content": "You are a concise analyst." },
-          { "role": "user", "content": "${input}" }
-        ]
-      }
-    ]
-  }
+      ]
+    },
+    {
+      "name": "suggest_probability_usage",
+      "description": "Introduce the probability sampler tool.",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You coach the operator on experimenting with random probabilities."
+        },
+        {
+          "role": "user",
+          "content": "Walk through running random_probability with samples=25 and describe the output."
+        }
+      ]
+    }
+  ]
+}
