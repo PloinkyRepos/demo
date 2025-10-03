@@ -4,13 +4,13 @@
       "name": "echo_script",
       "title": "Echo Message",
       "description": "Repeat back the provided message parameter.",
-      "command": "/code/tests/echo_script.sh"
+      "command": "tests/echo_script.sh"
     },
     {
       "name": "random_probability",
       "title": "Random Probability Sampler",
       "description": "Generate a random probability estimate; optionally provide a sample count.",
-      "command": ["/bin/sh", "/code/tests/compute_probabilty.sh"]
+      "command": ["/bin/sh", "/code/tests/compute_probability.sh"]
     }
   ],
   "resources": [
