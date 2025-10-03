@@ -4,7 +4,7 @@
       "name": "echo_script",
       "title": "Echo Message",
       "description": "Repeat back the provided message parameter.",
-      "command": ["/bin/sh", "/code/tests/echo_script.sh"]
+      "command": "/code/tests/echo_script.sh"
     },
     {
       "name": "random_probability",
