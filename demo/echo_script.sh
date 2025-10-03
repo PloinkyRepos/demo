@@ -1,22 +1,29 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/sh
+set -eu
+
+# This script reads a JSON payload from stdin, extracts the value of the first
+# parameter from the 'input' object, and prints it to stdout, adding a newline.
 
 payload=$(cat)
-message=$(printf '%s' "$payload" | node - <<'NODE'
-const fs = require('fs');
-try {
-  const data = JSON.parse(fs.readFileSync(0, 'utf8') || '{}');
-  const text = data.input && (data.input.message ?? data.input.text ?? '');
-  process.stdout.write(text ? String(text) : '');
-} catch (err) {
-  process.stderr.write('Invalid JSON payload');
-  process.exit(1);
-}
-NODE
-)
 
-if [ -z "${message}" ]; then
-  printf 'Echo: (no message provided)\n'
-else
-  printf 'Echo: %s\n' "$message"
-fi
+printf '%s' "$payload" | node - <<'NODE'
+const fs = require('fs');
+const input = fs.readFileSync(0, 'utf8') || '{}';
+let msg = '';
+try {
+    const data = JSON.parse(input);
+    if (data && data.input && typeof data.input === 'object') {
+        const keys = Object.keys(data.input);
+        if (keys.length > 0) {
+            const firstKey = keys[0];
+            const value = data.input[firstKey];
+            if (value !== null && value !== undefined) {
+                msg = String(value);
+            }
+        }
+    }
+} catch (err) {
+    // Exit silently on error, producing no output.
+}
+process.stdout.write(msg + '\n');
+NODE
