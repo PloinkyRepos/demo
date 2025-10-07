@@ -1,29 +1,19 @@
 #!/bin/sh
 set -eu
 
-# This script reads a JSON payload from stdin, extracts the value of the first
-# parameter from the 'input' object, and prints it to stdout, adding a newline.
-
+# Citește tot payloadul JSON de la stdin
 payload=$(cat)
 
-printf '%s' "$payload" | node - <<'NODE'
-const fs = require('fs');
-const input = fs.readFileSync(0, 'utf8') || '{}';
+# Rulează un mic script Node.js inline
+node - <<'NODE' "$payload"
+const raw = process.argv[2] || '{}';
 let msg = '';
 try {
-    const data = JSON.parse(input);
-    if (data && data.input && typeof data.input === 'object') {
-        const keys = Object.keys(data.input);
-        if (keys.length > 0) {
-            const firstKey = keys[0];
-            const value = data.input[firstKey];
-            if (value !== null && value !== undefined) {
-                msg = String(value);
-            }
-        }
-    }
-} catch (err) {
-    // Exit silently on error, producing no output.
-}
-process.stdout.write(msg + '\n');
+  const data = JSON.parse(raw);
+  if (data.input && typeof data.input === 'object') {
+    const firstKey = Object.keys(data.input)[0];
+    if (firstKey) msg = String(data.input[firstKey]);
+  }
+} catch {}
+process.stdout.write(`Echo: ${msg}\n`);
 NODE
