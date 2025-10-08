@@ -1,0 +1,17 @@
+{
+  "tools": [
+    {
+      "name": "run_simulation",
+      "title": "Monty Hall Simulation",
+      "description": "Run the Monty Hall simulation and return a formatted HTML report.",
+      "command": ["node", "/code/simulator.js"],
+      "inputSchema": {
+        "iterations": {
+          "type": "number",
+          "description": "Number of simulation iterations to execute.",
+          "min": 1
+        }
+      }
+    }
+  ]
+}

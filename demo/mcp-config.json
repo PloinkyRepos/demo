@@ -1,6 +1,16 @@
 {
   "tools": [
     {
+      "name": "status",
+      "title": "Status Check",
+      "description": "Returns a simple OK payload indicating the demo agent is responsive.",
+      "command": [
+        "/bin/sh",
+        "-lc",
+        "printf '{\"ok\":true,\"message\":\"ok\"}'\n"
+      ]
+    },
+    {
       "name": "echo_script",
       "title": "Echo Message",
       "description": "Repeat back the provided message parameter.",

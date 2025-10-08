@@ -225,50 +225,69 @@ function generateHTML(results) {
     `;
 }
 
-function main() {
-    const input = process.argv[2];
-    
-    if (!input) {
-        // Default to 10 iterations if no input
-        const results = runMontyHallSimulation(10);
-        const html = generateHTML(results);
-        console.log(html);
-        return;
-    }
-    
+function readStdin() {
+    return new Promise((resolve, reject) => {
+        let data = '';
+        process.stdin.setEncoding('utf8');
+        process.stdin.on('data', chunk => {
+            data += chunk;
+        });
+        process.stdin.on('end', () => resolve(data));
+        process.stdin.on('error', reject);
+    });
+}
+
+async function main() {
+    let raw = '';
     try {
-        // Decode base64 input
-        const decodedInput = Buffer.from(input, 'base64').toString('utf-8');
-        const data = JSON.parse(decodedInput);
-        
-        // Check for iterations parameter, default to 10 if invalid
-        let iterations = 10;
-        let message = '';
-        
-        if (data.iterations && typeof data.iterations === 'number' && data.iterations > 0) {
-            iterations = data.iterations;
-        } else {
-            message = '<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 10px; margin-bottom: 20px; color: #92400e;">⚠️ Invalid parameters received. Using default of 10 iterations.</div>';
-        }
-        
-        const results = runMontyHallSimulation(iterations);
-        let html = generateHTML(results);
-        
-        // Prepend warning message if parameters were invalid
-        if (message) {
-            html = message + html;
-        }
-        
-        console.log(html);
-    } catch (error) {
-        // If decoding fails, run with default 10 iterations
-        const results = runMontyHallSimulation(10);
-        let html = generateHTML(results);
-        html = '<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 10px; margin-bottom: 20px; color: #92400e;">⚠️ Could not decode parameters. Using default of 10 iterations.</div>' + html;
-        console.log(html);
+        raw = await readStdin();
+    } catch (err) {
+        console.error('Failed to read stdin:', err);
+        process.exit(1);
     }
+
+    let payload = {};
+    if (raw && raw.trim()) {
+        try {
+            payload = JSON.parse(raw);
+        } catch (err) {
+            console.warn('Could not parse payload JSON, falling back to defaults:', err?.message || String(err));
+        }
+    }
+
+    const maybeIterations = payload?.input?.iterations;
+    const numericIterations = Number(maybeIterations);
+    let iterations = 10;
+    let warningHtml = '';
+
+    if (Number.isFinite(numericIterations) && numericIterations > 0) {
+        iterations = Math.floor(numericIterations);
+    } else if (maybeIterations !== undefined) {
+        warningHtml = '<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 10px; margin-bottom: 20px; color: #92400e;">⚠️ Invalid parameters received. Using default of 10 iterations.</div>';
+    }
+
+    const results = runMontyHallSimulation(iterations);
+    let html = generateHTML(results);
+    if (warningHtml) {
+        html = warningHtml + html;
+    }
+
+    const response = {
+        ok: true,
+        iterations,
+        winsWithSwitch: results.winsWithSwitch,
+        winsWithoutSwitch: results.winsWithoutSwitch,
+        switchWinRate: results.switchWinRate,
+        stayWinRate: results.stayWinRate,
+        html
+    };
+
+    console.log(JSON.stringify(response));
 }
 
 if (require.main === module) {
-    main();
+    main().catch(err => {
+        console.error(err?.stack || err?.message || String(err));
+        process.exit(1);
+    });
 }
