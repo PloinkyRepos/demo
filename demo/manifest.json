@@ -1,6 +1,6 @@
 {
   "container": "node:18-alpine",
-  "install": "echo 'No installation needed.'",
+  "install": "echo 'This is a line' > myfile.txt",
   "update": "",
   "cli": "/bin/sh",
   "about": "Demo agent for providing static files",
