@@ -3,6 +3,5 @@
   "install": "echo 'No installation needed'",
   "update": "",
   "cli": "/bin/sh",
-  "agent": "/Agent/server/AgentServer.sh 'node /code/simulator.js'",
   "about": "Demo agent, enables an API for a Monty Hall Simulator"
 }
