@@ -6,5 +6,6 @@
   "about": "Demo agent for providing static files",
   "enable" : ["simulator", "moderator"],
   "repos" : {"vibe1":"https://github.com/PloinkyRepos/vibe.git",
-  "webmeet":"https://github.com/PloinkyRepos/webmeet.git"}
+  "webmeet":"https://github.com/PloinkyRepos/webmeet.git"},
+  "env": [{"DEMO_VAR":"DEMO_VALUE"}]
 }
