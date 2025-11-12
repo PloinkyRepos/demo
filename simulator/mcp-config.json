@@ -4,7 +4,7 @@
       "name": "run_simulation",
       "title": "Monty Hall Simulation",
       "description": "Run the Monty Hall simulation and return a formatted HTML report.",
-      "command": ["node", "/code/simulator.js"],
+      "command": "/code/simulator.js",
       "inputSchema": {
         "iterations": {
           "type": "number",
