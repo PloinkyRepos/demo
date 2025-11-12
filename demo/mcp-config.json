@@ -1,6 +1,12 @@
 {
   "tools": [
     {
+      "name": "status",
+      "title": "Demo Status",
+      "description": "Report the current status of the demo agent.",
+      "command": "/code/status_tool.sh"
+    },
+    {
       "name": "echo_script",
       "title": "Echo Message",
       "description": "Repeat back the provided message parameter.",
