@@ -4,7 +4,7 @@
       "name": "echo_script",
       "title": "Echo Message",
       "description": "Repeat back the provided message parameter.",
-      "command": ["/bin/sh", "/code/echo_script.sh"],
+      "command": "/code/echo_script.sh",
       "inputSchema": {
         "message": {
           "type": "string",
@@ -16,7 +16,7 @@
       "name": "random_probability",
       "title": "Random Probability Sampler",
       "description": "Generate a random probability estimate; optionally provide a sample count.",
-      "command": ["/bin/sh", "/code/compute_probability.sh"],
+      "command": "/code/compute_probability.sh",
       "inputSchema": {
         "samples": {
           "type": "number",
@@ -33,11 +33,7 @@
       "uri": "text://echo-tool/overview",
       "title": "Echo Tool Overview",
       "description": "Quick reference for the echo_script tool arguments.",
-      "command": [
-        "/bin/sh",
-        "-lc",
-        "printf 'Tool echo_script repeats the message you provide.\\nInvoke with arguments: {\"message\": \"Hello\"}.\\n'"
-      ],
+      "command": "/code/echo_tool_overview.sh",
       "mimeType": "text/plain"
     },
     {
@@ -45,11 +41,7 @@
       "uri": "text://random-probability/overview",
       "title": "Random Probability Overview",
       "description": "Explains how random_probability samples values.",
-      "command": [
-        "/bin/sh",
-        "-lc",
-        "printf 'Tool random_probability computes an averaged random value in [0,1].\\nOptional argument samples controls the Monte Carlo sample size.\\n'"
-      ],
+      "command": "/code/probability_tool_overview.sh",
       "mimeType": "text/plain"
     }
   ],
