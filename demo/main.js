@@ -8,9 +8,13 @@ const selfCallButton = document.getElementById('selfCall');
 const modal = document.getElementById('resultModal');
 const resultContent = document.getElementById('resultContent');
 const closeModalButton = document.getElementById('closeModalButton');
+const asyncTaskButton = document.getElementById('startAsyncTask');
+const asyncHistory = document.getElementById('asyncHistory');
+const asyncTaskEntries = new Map();
 
 const STATUS_TOOL = 'status';
 const SIMULATION_TOOL = 'run_simulation';
+const ASYNC_TASK_TOOL = 'demo_async_task';
 const demoClient = createAgentClient('/mcps/demo/mcp');
 const simulatorClient = createAgentClient('/mcps/simulator/mcp');
 
@@ -51,6 +55,73 @@ function showResult(html) {
 
 function closeModal() {
     modal.classList.remove('active');
+}
+
+function variantStyles(variant) {
+    const styles = {
+        running: { background: '#ebf8ff', color: '#2c5282' }, // blue
+        pending: { background: '#fffaf0', color: '#b7791f' }, // yellow
+        success: { background: '#e6fffa', color: '#2f855a' }, // green
+        error: { background: '#fff5f5', color: '#c53030' },   // red
+        info: { background: '#edf2ff', color: '#4c51bf' }
+    };
+    return styles[variant] || styles.info;
+}
+
+function formatStatusLabel(status) {
+    if (typeof status !== 'string' || !status.length) return 'Running';
+    return status.slice(0, 1).toUpperCase() + status.slice(1);
+}
+
+function statusVariant(status) {
+    const normalized = typeof status === 'string' ? status.toLowerCase() : '';
+    if (normalized === 'completed' || normalized === 'success') return 'success';
+    if (normalized === 'failed' || normalized === 'error') return 'error';
+    if (normalized === 'running' || normalized === 'queued') return 'running';
+    if (normalized === 'pending') return 'pending';
+    return 'info';
+}
+
+function getOrCreateAsyncTaskEntry(taskId) {
+    if (!taskId || !asyncHistory) {
+        return null;
+    }
+    if (asyncTaskEntries.has(taskId)) {
+        return asyncTaskEntries.get(taskId);
+    }
+    const empty = asyncHistory.querySelector('.async-history-empty');
+    if (empty) {
+        empty.remove();
+    }
+    const wrapper = document.createElement('div');
+    wrapper.className = 'async-history-item';
+    wrapper.dataset.taskId = taskId;
+    const header = document.createElement('div');
+    header.className = 'async-task-header';
+    const title = document.createElement('h4');
+    title.textContent = `Task ${taskId}`;
+    const statusBadge = document.createElement('span');
+    statusBadge.className = 'async-task-status';
+    header.append(title, statusBadge);
+    const output = document.createElement('p');
+    output.className = 'async-task-output';
+    wrapper.append(header, output);
+    asyncHistory.prepend(wrapper);
+    const entry = { card: wrapper, statusBadge, output };
+    asyncTaskEntries.set(taskId, entry);
+    return entry;
+}
+
+function updateAsyncTaskEntry(taskId, status, message, variant) {
+    if (!taskId) return;
+    const entry = getOrCreateAsyncTaskEntry(taskId);
+    if (!entry) return;
+    const resolvedVariant = variant || statusVariant(status);
+    const styles = variantStyles(resolvedVariant);
+    entry.statusBadge.textContent = formatStatusLabel(status);
+    entry.statusBadge.style.background = styles.background;
+    entry.statusBadge.style.color = styles.color;
+    entry.output.textContent = message || '';
 }
 
 async function selfCall() {
@@ -126,8 +197,54 @@ async function runSimulation() {
     }
 }
 
+function handleAsyncTaskResult(task) {
+    if (!task || !task.id) {
+        return;
+    }
+    const status = typeof task.status === 'string' ? task.status.toLowerCase() : 'unknown';
+    if (status === 'pending') {
+        updateAsyncTaskEntry(task.id, 'pending', 'Task queued. Waiting to start...', 'pending');
+        return;
+    }
+    if (status === 'running') {
+        updateAsyncTaskEntry(task.id, 'running', 'Task is running...', 'running');
+        return;
+    }
+    if (status === 'completed') {
+        const output = extractTextFromResult(task.result) || 'Task completed without output.';
+        updateAsyncTaskEntry(task.id, 'completed', output, 'success');
+        return;
+    }
+    if (status === 'failed') {
+        const message = task.error || 'Task failed.';
+        updateAsyncTaskEntry(task.id, 'failed', message, 'error');
+        return;
+    }
+    updateAsyncTaskEntry(task.id, status || 'unknown', 'Task status updated.', 'info');
+}
+
+async function startAsyncTask() {
+    if (!asyncTaskButton) return;
+
+    try {
+        const result = await demoClient.callTool(ASYNC_TASK_TOOL, {}, undefined, (task) => {
+            handleAsyncTaskResult(task);
+        });
+        const taskMeta = result?.metadata?.task;
+        const taskId = taskMeta?.id;
+        if (taskId) {
+            updateAsyncTaskEntry(taskId, 'pending', 'Task queued. Waiting to start...', 'pending');
+        }
+    } catch (error) {
+        console.error('Async task error:', error);
+    }
+}
+
 runButton.addEventListener('click', () => { void runSimulation(); });
 selfCallButton.addEventListener('click', () => { void selfCall(); });
+if (asyncTaskButton) {
+    asyncTaskButton.addEventListener('click', () => { void startAsyncTask(); });
+}
 closeModalButton.addEventListener('click', closeModal);
 
 window.addEventListener('click', (event) => {

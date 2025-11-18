@@ -221,6 +221,83 @@
         .result-content {
             margin-top: 20px;
         }
+
+        .async-panel {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            background: #fdfcff;
+        }
+
+        .async-panel h3 {
+            margin-bottom: 10px;
+            color: #4c51bf;
+        }
+
+        .async-panel p {
+            margin-bottom: 15px;
+            color: #555;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+
+        .async-status {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #f0f4ff;
+            color: #4c51bf;
+            font-size: 0.95em;
+        }
+
+        .async-history {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .async-history-item {
+            padding: 12px;
+            border-radius: 8px;
+            background: #f7f7fb;
+            border: 1px solid #e0e0f6;
+        }
+
+        .async-task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .async-task-header h4 {
+            font-size: 0.95em;
+            color: #4c51bf;
+        }
+
+        .async-task-status {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.8em;
+            font-weight: 600;
+            background: #edf2ff;
+            color: #4c51bf;
+        }
+
+        .async-task-output {
+            margin: 0;
+            font-size: 0.85em;
+            color: #555;
+        }
+
+        .async-history-empty {
+            font-size: 0.85em;
+            color: #888;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -258,6 +335,17 @@
         <div class="loading" id="loading">
             <span class="spinner"></span>
             <span>Simulation in progress...</span>
+        </div>
+
+        <div class="async-panel">
+            <h3>⏱️ Async Task Demo</h3>
+            <p>Start a mock long running task on the demo agent. You will be notified once the background task finishes.</p>
+            <button id="startAsyncTask" type="button">
+                🕒 Start Async Task
+            </button>
+            <div id="asyncHistory" class="async-history">
+                <p class="async-history-empty">No completed tasks yet.</p>
+            </div>
         </div>
     </div>
 

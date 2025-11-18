@@ -19,6 +19,14 @@
       }
     },
     {
+      "name": "demo_async_task",
+      "title": "Demo Async Task",
+      "description": "Queues a mock long running task to demonstrate async execution.",
+      "command": "/code/demo_async_task.sh",
+      "async": true,
+      "timeout": 120000
+    },
+    {
       "name": "random_probability",
       "title": "Random Probability Sampler",
       "description": "Generate a random probability estimate; optionally provide a sample count.",
