@@ -124,6 +124,20 @@ function updateAsyncTaskEntry(taskId, status, message, variant) {
     entry.output.textContent = message || '';
 }
 
+function renameAsyncTaskEntry(oldId, newId) {
+    if (!oldId || !newId || oldId === newId) {
+        return newId || oldId;
+    }
+    const entry = asyncTaskEntries.get(oldId);
+    if (!entry) {
+        return newId;
+    }
+    asyncTaskEntries.delete(oldId);
+    asyncTaskEntries.set(newId, entry);
+    entry.card.dataset.taskId = newId;
+    return newId;
+}
+
 async function selfCall() {
     loadingDiv.classList.add('active');
     selfCallButton.disabled = true;
@@ -225,18 +239,25 @@ function handleAsyncTaskResult(task) {
 
 async function startAsyncTask() {
     if (!asyncTaskButton) return;
-
+    const placeholderId = `pending-${Date.now()}`;
+    updateAsyncTaskEntry(placeholderId, 'pending', 'Task started...', 'pending');
     try {
-        const result = await demoClient.callTool(ASYNC_TASK_TOOL, {}, undefined, (task) => {
-            handleAsyncTaskResult(task);
+        const result = await demoClient.callTool(ASYNC_TASK_TOOL, {});
+        const taskId = renameAsyncTaskEntry(placeholderId, result?.metadata?.taskId || placeholderId);
+        handleAsyncTaskResult({
+            id: taskId,
+            status: result?.metadata?.status || 'completed',
+            result: { content: result.content },
+            error: null
         });
-        const taskMeta = result?.metadata?.task;
-        const taskId = taskMeta?.id;
-        if (taskId) {
-            updateAsyncTaskEntry(taskId, 'pending', 'Task queued. Waiting to start...', 'pending');
-        }
     } catch (error) {
         console.error('Async task error:', error);
+        if (error?.task) {
+            const taskId = renameAsyncTaskEntry(placeholderId, error.task.id || placeholderId);
+            handleAsyncTaskResult({ ...error.task, id: taskId });
+        } else {
+            updateAsyncTaskEntry(placeholderId, 'failed', error?.message || 'Task failed.', 'error');
+        }
     }
 }
 
