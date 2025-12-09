@@ -3,7 +3,10 @@
 # install.sh - Skill Explorer Container Installation Script
 # ============================================================================
 # This script runs inside the container during ploinky agent installation.
-# It sets up dependencies and verifies the skill-manager built-in skills.
+# It verifies the skill-manager built-in skills.
+#
+# NOTE: The install hook runs with /code mounted read-only.
+# Directory creation is done in postinstall.sh which runs after container start.
 #
 # NOTE: skill-manager-skills/ directory should be included in the skill-explorer
 # source directory (copied from skill-manager-cli/skill-manager/src/.AchillesSkills)
@@ -29,23 +32,7 @@ else
   echo "Warning: skill-manager-skills/ not found in /code/"
   echo "Built-in skills will not be available."
   echo "You can still create custom skills in .AchillesSkills/"
-  mkdir -p /code/skill-manager-skills
 fi
-
-# ============================================================================
-# Create directories
-# ============================================================================
-echo "Creating directories..."
-mkdir -p /code/.AchillesSkills
-mkdir -p /code/logs
-
-# ============================================================================
-# Make scripts executable
-# ============================================================================
-echo "Setting script permissions..."
-chmod +x /code/tools/*.sh 2>/dev/null || true
-chmod +x /code/scripts/*.sh 2>/dev/null || true
-chmod +x /code/scripts/deploy/*.sh 2>/dev/null || true
 
 # ============================================================================
 # Verify installation
@@ -55,7 +42,7 @@ echo "============================================"
 echo "Installation complete!"
 echo "============================================"
 echo ""
-echo "Directory structure:"
+echo "Directory structure (will be created on first run):"
 echo "  /code/.AchillesSkills/     - Your custom skills"
 echo "  /code/skill-manager-skills/ - Built-in skills"
 echo "  /code/tools/               - MCP tool scripts"

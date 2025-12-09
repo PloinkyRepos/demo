@@ -17,7 +17,7 @@
 #
 # ============================================================================
 set -eu
-
+export PLOINKY_CODE_WRITABLE=1
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SKILL_EXPLORER_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
@@ -98,22 +98,21 @@ fi
 # Detect container runtime for router URL
 if command -v podman >/dev/null 2>&1; then
     CONTAINER_HOST="host.containers.internal"
+    CONTAINER_CMD="podman"
     log "Using Podman (host: $CONTAINER_HOST)"
 elif command -v docker >/dev/null 2>&1; then
     CONTAINER_HOST="host.docker.internal"
+    CONTAINER_CMD="docker"
     log "Using Docker (host: $CONTAINER_HOST)"
 else
     CONTAINER_HOST="127.0.0.1"
+    CONTAINER_CMD=""
     log "No container runtime detected, using localhost"
 fi
 
 # ============================================================================
 # Set Ploinky Variables
 # ============================================================================
-# ALWAYS set PLOINKY_CODE_WRITABLE - required for skill-explorer to work
-log "Setting PLOINKY_CODE_WRITABLE=1 (required for /code to be writable)"
-ploinky var PLOINKY_CODE_WRITABLE 1
-
 if [ "$SKIP_VARS" = "false" ]; then
     log "============================================"
     log "Setting up ploinky variables..."
@@ -163,23 +162,19 @@ log "============================================"
 log "Setting up skill-explorer agent..."
 log "============================================"
 
-# Check if coralFlow repo exists, if not add it
-if ! ploinky list repos 2>/dev/null | grep -q "coralFlow"; then
-    log "Adding coralFlow repository..."
-    ploinky add repo coralFlow https://github.com/OutfinityResearch/coralFlow || true
-fi
+# Add demo repo from GitHub
+log "Adding demo repository..."
+ploinky add repo demo https://github.com/PloinkyRepos/demo.git
+ploinky enable repo demo
 
-ploinky enable repo coralFlow 2>/dev/null || true
-
-# Enable skill-explorer agent from demo folder
+# Enable skill-explorer agent
 log "Enabling skill-explorer agent..."
-ploinky enable agent demo/skill-explorer || {
-    log "Note: If skill-explorer is not found in repo, using local path..."
-    # Fall back to local development path if available
-    if [ -d "$SKILL_EXPLORER_DIR" ]; then
-        log "Using local skill-explorer at $SKILL_EXPLORER_DIR"
-    fi
-}
+ploinky enable agent skill-explorer
+
+# Make /code writable in containers (allows skill file editing)
+# This MUST be set AFTER repos are added/enabled but BEFORE start
+ploinky var PLOINKY_CODE_WRITABLE 1
+log "Set PLOINKY_CODE_WRITABLE=1 for development"
 
 # Optionally enable explorer
 if [ "$WITH_EXPLORER" = "true" ]; then
