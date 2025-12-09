@@ -1,5 +1,6 @@
 {
   "container": "node:20-alpine",
+  "preinstall": "./scripts/preinstall.sh",
   "install": "/code/scripts/install.sh",
   "cli": "node /code/main.mjs",
   "agent": "node /code/main.mjs",

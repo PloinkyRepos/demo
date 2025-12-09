@@ -3,7 +3,11 @@
 # install.sh - Skill Explorer Container Installation Script
 # ============================================================================
 # This script runs inside the container during ploinky agent installation.
-# It sets up dependencies and copies skill-manager built-in skills.
+# It sets up dependencies and verifies the skill-manager built-in skills.
+#
+# NOTE: skill-manager-skills/ directory should be included in the skill-explorer
+# source directory (copied from skill-manager-cli/skill-manager/src/.AchillesSkills)
+# so it's available inside the container at /code/skill-manager-skills/
 # ============================================================================
 set -e
 
@@ -13,49 +17,16 @@ echo "============================================"
 echo "Installing skill-explorer..."
 echo "============================================"
 
-# Install npm dependencies
-echo "Installing npm dependencies..."
-npm install --production 2>/dev/null || npm install
-
 # ============================================================================
-# Copy skill-manager-cli built-in skills
+# Verify skill-manager built-in skills
 # ============================================================================
-# Try multiple possible locations for skill-manager source
-SKILL_MGR_LOCATIONS="
-/workspace/coralFlow/skill-manager-cli/skill-manager/src
-/workspace/skill-manager-cli/skill-manager/src
-/code/../skill-manager-cli/skill-manager/src
-"
-
-SKILL_MGR_SRC=""
-for loc in $SKILL_MGR_LOCATIONS; do
-  if [ -d "$loc/.AchillesSkills" ]; then
-    SKILL_MGR_SRC="$loc"
-    break
-  fi
-done
-
-if [ -n "$SKILL_MGR_SRC" ]; then
-  echo "Found skill-manager at: $SKILL_MGR_SRC"
-  echo "Copying built-in skills..."
-
-  # Copy built-in skills
-  cp -r "$SKILL_MGR_SRC/.AchillesSkills" /code/skill-manager-skills
-
-  # Copy supporting modules (optional, for advanced features)
-  for module in repl ui schemas lib; do
-    if [ -d "$SKILL_MGR_SRC/$module" ]; then
-      cp -r "$SKILL_MGR_SRC/$module" /code/ 2>/dev/null || true
-      echo "  Copied $module/"
-    fi
-  done
+# The skill-manager-skills directory should already be in /code/ from the source
+if [ -d "/code/skill-manager-skills" ]; then
+  SKILL_COUNT=$(find /code/skill-manager-skills -maxdepth 1 -type d 2>/dev/null | wc -l)
+  SKILL_COUNT=$((SKILL_COUNT - 1))
+  echo "Found skill-manager-skills/ with $SKILL_COUNT built-in skills"
 else
-  echo "Warning: skill-manager-cli source not found"
-  echo "Checked locations:"
-  for loc in $SKILL_MGR_LOCATIONS; do
-    echo "  - $loc"
-  done
-  echo ""
+  echo "Warning: skill-manager-skills/ not found in /code/"
   echo "Built-in skills will not be available."
   echo "You can still create custom skills in .AchillesSkills/"
   mkdir -p /code/skill-manager-skills
