@@ -166,6 +166,7 @@ log "============================================"
 log "Adding demo repository..."
 ploinky add repo demo https://github.com/PloinkyRepos/demo.git
 ploinky enable repo demo
+ploinky enable agent explorer global
 
 # Enable skill-explorer agent
 log "Enabling skill-explorer agent..."

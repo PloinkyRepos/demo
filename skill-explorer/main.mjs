@@ -54,10 +54,10 @@ function formatResult(result) {
         for (let i = executions.length - 1; i >= 0; i--) {
             const exec = executions[i];
             if (exec.outcome?.result) {
-                return exec.outcome.result;
+                return formatResult(exec.outcome.result);
             }
             if (exec.result) {
-                return typeof exec.result === 'string' ? exec.result : formatResult(exec.result);
+                return formatResult(exec.result);
             }
         }
 

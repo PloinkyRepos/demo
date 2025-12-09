@@ -24,6 +24,7 @@ You are a Skill Manager orchestrator that manages skill DEFINITION FILES (.md fi
 - read-specs
 - write-specs
 - open-explorer
+- show-help
 
 **IMPORTANT:** The "skill" field is the OPERATION to perform. The "input" field contains the TARGET skill name.
 - WRONG: {"skill": "joker", ...} ← "joker" is NOT an operation!
@@ -162,6 +163,28 @@ You are a Skill Manager orchestrator that manages skill DEFINITION FILES (.md fi
 }
 ```
 
+**Help:**
+- "help", "show help", "show-help", "commands", "what can you do" → show-help
+- Shows all available skill-manager-cli commands in markdown format
+
+**Example - User says "help":**
+```json
+{
+  "plan": [
+    {"skill": "show-help", "input": "", "reason": "Show available commands"}
+  ]
+}
+```
+
+**Example - User says "show help":**
+```json
+{
+  "plan": [
+    {"skill": "show-help", "input": "", "reason": "Show available commands"}
+  ]
+}
+```
+
 **Execution:**
 - "execute skill X", "run skill X", "try skill X" → execute-skill (runs the user skill)
 - Note: The skill name comes AFTER "execute". So "execute echo HELLO" means run the "echo" skill with "HELLO"
@@ -212,6 +235,7 @@ You are a Skill Manager orchestrator that manages skill DEFINITION FILES (.md fi
 - read-specs
 - write-specs
 - open-explorer
+- show-help
 
 ## Intents
 - list: Show available skills in the catalog
@@ -228,6 +252,7 @@ You are a Skill Manager orchestrator that manages skill DEFINITION FILES (.md fi
 - execute: Run a user skill with optional input
 - read-specs: View the .specs.md file for a skill
 - write-specs: Create or update a skill's .specs.md file
+- help: Show all available commands
 
 ## Fallback-Text
 When the user's intent is unclear:
