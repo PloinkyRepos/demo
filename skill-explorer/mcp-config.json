@@ -1,0 +1,126 @@
+{
+  "tools": [
+    {
+      "name": "list_skills",
+      "title": "List Skills",
+      "description": "List all available skills in the .AchillesSkills directory",
+      "command": "/code/tools/list_skills.sh"
+    },
+    {
+      "name": "read_skill",
+      "title": "Read Skill",
+      "description": "Read a skill definition file (.md) by name",
+      "command": "/code/tools/read_skill.sh",
+      "inputSchema": {
+        "skillName": {
+          "type": "string",
+          "description": "Name of the skill to read"
+        }
+      }
+    },
+    {
+      "name": "write_skill",
+      "title": "Write Skill",
+      "description": "Create or update a skill definition",
+      "command": "/code/tools/write_skill.sh",
+      "inputSchema": {
+        "skillName": {
+          "type": "string",
+          "description": "Name of the skill"
+        },
+        "skillType": {
+          "type": "string",
+          "description": "Type: tskill, cskill, iskill, oskill, mskill"
+        },
+        "content": {
+          "type": "string",
+          "description": "Skill definition content in markdown"
+        }
+      }
+    },
+    {
+      "name": "validate_skill",
+      "title": "Validate Skill",
+      "description": "Validate a skill definition against its schema",
+      "command": "/code/tools/validate_skill.sh",
+      "inputSchema": {
+        "skillName": {
+          "type": "string",
+          "description": "Name of the skill to validate"
+        }
+      }
+    },
+    {
+      "name": "generate_code",
+      "title": "Generate Code",
+      "description": "Generate .mjs code from a tskill definition",
+      "command": "/code/tools/generate_code.sh",
+      "inputSchema": {
+        "skillName": {
+          "type": "string",
+          "description": "Name of the tskill to generate code for"
+        }
+      }
+    },
+    {
+      "name": "test_code",
+      "title": "Test Code",
+      "description": "Test generated skill code",
+      "command": "/code/tools/test_code.sh",
+      "inputSchema": {
+        "skillName": {
+          "type": "string",
+          "description": "Name of the skill to test"
+        }
+      }
+    },
+    {
+      "name": "execute_skill",
+      "title": "Execute Skill",
+      "description": "Execute any skill with given input",
+      "command": "/code/tools/execute_skill.sh",
+      "inputSchema": {
+        "skillName": {
+          "type": "string",
+          "description": "Name of the skill to execute"
+        },
+        "input": {
+          "type": "string",
+          "description": "Input/prompt for the skill"
+        }
+      }
+    },
+    {
+      "name": "open_explorer",
+      "title": "Open File Explorer",
+      "description": "Get URL to open AssistOSExplorer for browsing skill files",
+      "command": "/code/tools/open_explorer.sh"
+    }
+  ],
+  "resources": [
+    {
+      "name": "skill_types_overview",
+      "uri": "text://skill-explorer/overview",
+      "title": "Skill Types Overview",
+      "description": "Overview of available skill types and their purposes",
+      "command": "/code/tools/overview_resource.sh",
+      "mimeType": "text/markdown"
+    }
+  ],
+  "prompts": [
+    {
+      "name": "create_tskill_guide",
+      "description": "Guide for creating a new database table skill",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You help users create tskill (table skill) definitions for database entities."
+        },
+        {
+          "role": "user",
+          "content": "Guide me through creating a tskill. Ask about the entity name, fields, validators, and presenters needed."
+        }
+      ]
+    }
+  ]
+}

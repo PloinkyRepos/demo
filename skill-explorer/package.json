@@ -1,0 +1,10 @@
+{
+  "name": "skill-explorer",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Skill manager CLI agent for ploinky webchat",
+  "main": "main.mjs",
+  "dependencies": {
+    "achillesAgentLib": "file:../../../coral-agent/node_modules/achillesAgentLib"
+  }
+}
