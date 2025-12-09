@@ -3,7 +3,7 @@
  */
 
 export async function action(input, context = {}) {
-    const explorerUrl = 'http://127.0.0.1:8080/explorer/index.html';
+    const explorerUrl = 'PLACEHOLDER_BASE_URL/explorer/index.html';
 
     return {
         success: true,
