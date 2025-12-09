@@ -119,25 +119,79 @@ async function main() {
   console.log('Type your commands or use natural language to manage skills');
   console.log('');
 
-  // REPL loop using readline
+  // Container mode detection - keep process alive when no TTY
+  const isContainerMode = !process.stdin.isTTY;
+  if (isContainerMode) {
+    process.stdin.resume();
+  }
+
+  // REPL loop using readline with event-based handling
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
     terminal: false
   });
 
-  for await (const line of rl) {
+  // Track if we're processing to prevent premature shutdown
+  let isProcessing = false;
+
+  // Inactivity timeout - shutdown if no input for 30 minutes
+  const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000;
+  let inactivityTimer = null;
+
+  const resetInactivityTimer = () => {
+    if (inactivityTimer) {
+      clearTimeout(inactivityTimer);
+    }
+    inactivityTimer = setTimeout(() => {
+      console.log('Inactivity timeout reached, shutting down...');
+      process.exit(0);
+    }, INACTIVITY_TIMEOUT_MS);
+  };
+
+  // Handle readline close - in container mode, stay alive
+  rl.on('close', () => {
+    if (isContainerMode) {
+      // Stay alive for inactivity timeout in container mode
+      return;
+    }
+    setTimeout(() => {
+      if (!isProcessing) {
+        process.exit(0);
+      }
+    }, 5000);
+  });
+
+  // Handle stdin end - ignore in container mode
+  process.stdin.on('end', () => {
+    if (isContainerMode) {
+      // Ignore stdin end in container mode
+      return;
+    }
+  });
+
+  // Handle stdin errors gracefully
+  process.stdin.on('error', () => {});
+
+  // Start inactivity timer
+  resetInactivityTimer();
+
+  // Process each line of input using events (not for-await)
+  rl.on('line', async (line) => {
+    resetInactivityTimer();
+
     const trimmed = line.trim();
-    if (!trimmed) continue;
+    if (!trimmed) return;
 
     // Parse webchat envelope if present
     const { text, user } = parseWebchatEnvelope(trimmed);
-    if (!text) continue;
+    if (!text) return;
 
     // Handle exit commands
     if (text === 'exit' || text === 'quit' || text === '.exit') {
       console.log('Goodbye!');
-      break;
+      rl.close();
+      process.exit(0);
     }
 
     // Handle help command
@@ -164,10 +218,12 @@ Skill Types:
   oskill  - Orchestrator (routes to other skills)
   mskill  - MCP tool integration
 `);
-      continue;
+      return;
     }
 
     try {
+      isProcessing = true;
+
       // Execute through skills-orchestrator
       const result = await agent.executePrompt(text, {
         skillName: 'skills-orchestrator',
@@ -183,10 +239,10 @@ Skill Types:
       if (process.env.DEBUG) {
         console.error(error.stack);
       }
+    } finally {
+      isProcessing = false;
     }
-  }
-
-  process.exit(0);
+  });
 }
 
 main().catch(err => {
