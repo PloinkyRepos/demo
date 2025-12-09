@@ -177,6 +177,11 @@ ploinky enable agent skill-explorer
 ploinky var PLOINKY_CODE_WRITABLE 1
 log "Set PLOINKY_CODE_WRITABLE=1 for development"
 
+# Set explorer root to .AchillesSkills directory
+WORKSPACE_DIR="$(pwd)"
+ploinky var ASSISTOS_FS_ROOT "${WORKSPACE_DIR}/.ploinky/repos/demo/skill-explorer/.AchillesSkills"
+log "Set ASSISTOS_FS_ROOT to .AchillesSkills directory"
+
 # Optionally enable explorer
 if [ "$WITH_EXPLORER" = "true" ]; then
     log "Enabling file explorer agent..."

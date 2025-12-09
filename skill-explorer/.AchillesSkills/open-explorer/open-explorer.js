@@ -11,8 +11,6 @@ export async function action(input, context = {}) {
 
 **Open Explorer:** [${explorerUrl}](${explorerUrl})
 
-**Navigate to:** \`.ploinky/repos/demo/skill-explorer/\` to see skill files
-
-**Skills Directory:** \`.ploinky/repos/demo/skill-explorer/.AchillesSkills/\``
+The explorer opens directly to the **.AchillesSkills** directory where all skills are stored.`
     };
 }

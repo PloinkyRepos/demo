@@ -35,6 +35,11 @@ echo "  PLOINKY_ROUTER_URL=$ROUTER_URL"
 ploinky var PLOINKY_CODE_WRITABLE 1
 echo "  PLOINKY_CODE_WRITABLE=1"
 
+# Set explorer root to .AchillesSkills directory
+WORKSPACE_DIR="$(pwd)"
+ploinky var ASSISTOS_FS_ROOT "${WORKSPACE_DIR}/.ploinky/repos/demo/skill-explorer/.AchillesSkills"
+echo "  ASSISTOS_FS_ROOT=${WORKSPACE_DIR}/.ploinky/repos/demo/skill-explorer/.AchillesSkills"
+
 # LLM API Keys
 if [ -n "${OPENAI_API_KEY:-}" ]; then
     ploinky var OPENAI_API_KEY "$OPENAI_API_KEY"
