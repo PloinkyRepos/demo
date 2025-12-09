@@ -110,6 +110,10 @@ fi
 # ============================================================================
 # Set Ploinky Variables
 # ============================================================================
+# ALWAYS set PLOINKY_CODE_WRITABLE - required for skill-explorer to work
+log "Setting PLOINKY_CODE_WRITABLE=1 (required for /code to be writable)"
+ploinky var PLOINKY_CODE_WRITABLE 1
+
 if [ "$SKIP_VARS" = "false" ]; then
     log "============================================"
     log "Setting up ploinky variables..."
@@ -119,10 +123,6 @@ if [ "$SKIP_VARS" = "false" ]; then
     ROUTER_URL="${PLOINKY_ROUTER_URL:-http://${CONTAINER_HOST}:${ROUTER_PORT}}"
     ploinky var PLOINKY_ROUTER_URL "$ROUTER_URL"
     log "Set PLOINKY_ROUTER_URL=$ROUTER_URL"
-
-    # Make /code writable in containers
-    ploinky var PLOINKY_CODE_WRITABLE 1
-    log "Set PLOINKY_CODE_WRITABLE=1"
 
     # LLM API Keys - only set if provided
     if [ -n "${OPENAI_API_KEY:-}" ] && [ "$OPENAI_API_KEY" != "sk-your-api-key-here" ]; then

@@ -14,13 +14,27 @@ SKILL_EXPLORER_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 echo "============================================"
 echo "Preinstall: Copying skill-manager skills..."
 echo "============================================"
+echo "SCRIPT_DIR: $SCRIPT_DIR"
+echo "SKILL_EXPLORER_DIR: $SKILL_EXPLORER_DIR"
 
-# Find skill-manager-cli source relative to skill-explorer
-# skill-explorer is at: coralFlow/demo/skill-explorer
-# skill-manager-cli is at: coralFlow/skill-manager-cli
-SKILL_MGR_SRC="$SKILL_EXPLORER_DIR/../../skill-manager-cli/skill-manager/src/.AchillesSkills"
+# Try multiple possible locations for skill-manager-cli
+# When running from ploinky repos, the structure varies
+SKILL_MGR_LOCATIONS="
+$SKILL_EXPLORER_DIR/../../skill-manager-cli/skill-manager/src/.AchillesSkills
+$SKILL_EXPLORER_DIR/../../../skill-manager-cli/skill-manager/src/.AchillesSkills
+/home/apparatus/work/file-parser/coralFlow/skill-manager-cli/skill-manager/src/.AchillesSkills
+"
 
-if [ -d "$SKILL_MGR_SRC" ]; then
+SKILL_MGR_SRC=""
+for loc in $SKILL_MGR_LOCATIONS; do
+  echo "Checking: $loc"
+  if [ -d "$loc" ]; then
+    SKILL_MGR_SRC="$loc"
+    break
+  fi
+done
+
+if [ -n "$SKILL_MGR_SRC" ]; then
   echo "Found skill-manager at: $SKILL_MGR_SRC"
 
   # Remove old copy if exists
@@ -33,7 +47,11 @@ if [ -d "$SKILL_MGR_SRC" ]; then
   SKILL_COUNT=$((SKILL_COUNT - 1))
   echo "Copied $SKILL_COUNT built-in skills to skill-manager-skills/"
 else
-  echo "Warning: skill-manager-cli not found at: $SKILL_MGR_SRC"
+  echo "Warning: skill-manager-cli not found"
+  echo "Checked locations:"
+  for loc in $SKILL_MGR_LOCATIONS; do
+    echo "  - $loc"
+  done
   echo "Built-in skills will not be available."
   mkdir -p "$SKILL_EXPLORER_DIR/skill-manager-skills"
 fi
