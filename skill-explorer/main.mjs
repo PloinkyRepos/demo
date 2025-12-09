@@ -301,11 +301,10 @@ async function main() {
             // Output processing indicator (triggers typing animation in webchat)
             console.log('...');
 
-            // Execute through skills-orchestrator
+            // Execute through RecursiveSkilledAgent (auto-routes to appropriate skill)
+            // This lets the agent's FlexSearch find the best matching skill
             const result = await agent.executePrompt(text, {
-                skillName: 'skills-orchestrator',
                 context,
-                mode: 'deep',
             });
 
             // Format and output result

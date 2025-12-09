@@ -6,7 +6,7 @@ cat << EOF
 {
   "content": [{
     "type": "text",
-    "text": "## File Explorer Access\n\n**Workspace Path:** /code\n\n**Skills Directory:** /code/.AchillesSkills\n\n**Explorer MCP Endpoint:** ${ROUTER_URL}/mcps/explorer/mcp\n\n### How to Browse Files\n\nThe explorer agent has been enabled and has access to this workspace. You can:\n\n1. **Use Explorer MCP Tools:**\n   - \`list_directory\` - List files in a directory\n   - \`read_text_file\` - Read file contents\n   - \`write_file\` - Create or update files\n   - \`create_directory\` - Create directories\n   - \`delete_file\` - Delete files\n\n2. **Access the Web Interface:**\n   Visit the ploinky dashboard to access the graphical file explorer.\n\n### Quick Actions\n\n- **View Skills:** Use \`list_directory\` on \`/code/.AchillesSkills\`\n- **Read Skill:** Use \`read_text_file\` on \`/code/.AchillesSkills/<skillName>/tskill.md\`"
+    "text": "## File Explorer\n\n**Open Explorer:** [${ROUTER_URL}/mcps/explorer/](${ROUTER_URL}/mcps/explorer/)\n\n**Skills Directory:** /code/.AchillesSkills\n\n**MCP Endpoint:** ${ROUTER_URL}/mcps/explorer/mcp\n\n### Available Tools\n\n| Tool | Description |\n| --- | --- |\n| \`list_directory\` | List files in a directory |\n| \`read_text_file\` | Read file contents |\n| \`write_file\` | Create or update files |\n| \`create_directory\` | Create directories |\n| \`delete_file\` | Delete files |"
   }]
 }
 EOF
