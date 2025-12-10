@@ -7,7 +7,7 @@
     "enable": [
         "simulator",
         "moderator",
-        "explorer"
+        "explorer global"
     ],
     "repos": {
         "vibe1": "https://github.com/PloinkyRepos/vibe.git",
