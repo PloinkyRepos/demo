@@ -1,7 +1,4 @@
 #!/bin/sh
-# ============================================================================
-ploinky enable repo demo
-
 # Make /code writable in containers (allows skill file editing)
 # This MUST be set AFTER repos are added/enabled but BEFORE start
 ploinky var PLOINKY_CODE_WRITABLE 1
