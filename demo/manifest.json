@@ -16,7 +16,8 @@
     },
     "env": [
         {
-            "DEMO_VAR": "DEMO_VALUE"
+            "name": "DEMO_VAR",
+            "value": "DEMO_VALUE"
         }
     ]
 }
