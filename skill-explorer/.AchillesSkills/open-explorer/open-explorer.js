@@ -9,8 +9,6 @@ export async function action(input, context = {}) {
         success: true,
         message: `## File Explorer
 
-**Open Explorer:** [${explorerUrl}](${explorerUrl})
-
-The explorer opens directly to the **.AchillesSkills** directory where all skills are stored.`
+**Open Explorer:** [${explorerUrl}](${explorerUrl})`
     };
 }

@@ -162,36 +162,21 @@ log "============================================"
 log "Setting up skill-explorer agent..."
 log "============================================"
 
-# Add demo repo from GitHub
-log "Adding demo repository..."
+# Add and enable demo repo from GitHub
+# The skill-explorer manifest.json handles enabling all required agents
+log "Adding and enabling demo repository..."
 ploinky add repo demo https://github.com/PloinkyRepos/demo.git
 ploinky enable repo demo
-ploinky enable agent explorer global
-
-# Enable skill-explorer agent
-log "Enabling skill-explorer agent..."
-ploinky enable agent skill-explorer
 
 # Make /code writable in containers (allows skill file editing)
 # This MUST be set AFTER repos are added/enabled but BEFORE start
 ploinky var PLOINKY_CODE_WRITABLE 1
 log "Set PLOINKY_CODE_WRITABLE=1 for development"
 
-# Set explorer root to .AchillesSkills directory
-WORKSPACE_DIR="$(pwd)"
-ploinky var ASSISTOS_FS_ROOT "${WORKSPACE_DIR}/.ploinky/repos/demo/skill-explorer/.AchillesSkills"
-log "Set ASSISTOS_FS_ROOT to .AchillesSkills directory"
-
-# Optionally enable explorer
-if [ "$WITH_EXPLORER" = "true" ]; then
-    log "Enabling file explorer agent..."
-    ploinky enable agent AssistOSExplorer/explorer || ploinky enable agent explorer || true
-fi
-
 # ============================================================================
 # Start the Agent
 # ============================================================================
-log "Starting skill-explorer agent..."
+log "Starting skill-explorer agent on port $ROUTER_PORT..."
 ploinky start skill-explorer "$ROUTER_PORT"
 
 # ============================================================================

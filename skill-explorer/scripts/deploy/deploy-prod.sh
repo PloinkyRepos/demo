@@ -294,19 +294,10 @@ YAML
 fi
 
 # ============================================================================
-# PART 2: Skill Explorer Agent Setup
+# PART 2: Skill Explorer Agent Setup (Simplified)
 # ============================================================================
 if [ "$SKIP_AGENT" = "false" ]; then
     log_section "Setting up Skill Explorer Agent"
-
-    # Detect container host
-    if command -v podman >/dev/null 2>&1; then
-        CONTAINER_HOST="host.containers.internal"
-    elif command -v docker >/dev/null 2>&1; then
-        CONTAINER_HOST="host.docker.internal"
-    else
-        CONTAINER_HOST="127.0.0.1"
-    fi
 
     # Set ploinky variables
     log "Setting ploinky variables..."
@@ -329,29 +320,9 @@ if [ "$SKIP_AGENT" = "false" ]; then
         log "Set GEMINI_API_KEY from environment"
     fi
 
-    # Add demo repo if not already added
-    log "Adding demo repository..."
-    ploinky add repo demo https://github.com/PloinkyRepos/demo.git || true
-    ploinky enable repo demo || true
-
-    # Add AssistOSExplorer repo for file explorer
-    log "Adding AssistOSExplorer repository..."
-    ploinky add repo AssistOSExplorer https://github.com/PloinkyRepos/AssistOSExplorer.git || true
-    ploinky enable repo AssistOSExplorer || true
-
-    # Enable skill-explorer agent
-    log "Enabling skill-explorer agent..."
-    ploinky enable agent skill-explorer
-
-    # Enable explorer agent as GLOBAL (uses workspace directory as root)
-    log "Enabling explorer agent (global mode)..."
-    ploinky enable agent explorer global
-
-    # Set ASSISTOS_FS_ROOT to point to .AchillesSkills directory
-    WORKSPACE_DIR=$(pwd)
-    SKILL_EXPLORER_CODE="${WORKSPACE_DIR}/.ploinky/repos/demo/skill-explorer/.AchillesSkills"
-    log "Setting ASSISTOS_FS_ROOT=${SKILL_EXPLORER_CODE}"
-    ploinky var ASSISTOS_FS_ROOT "$SKILL_EXPLORER_CODE"
+    # Enable demo repo - the skill-explorer manifest.json handles enabling all required agents
+    log "Enabling demo repository..."
+    ploinky enable repo demo
 
     # Make /code writable
     ploinky var PLOINKY_CODE_WRITABLE 1
