@@ -1,5 +1,5 @@
 {
-    "container": "node:18-alpine",
+    "container": "node:18-bullseye",
     "update": "",
     "cli": "/bin/sh",
     "about": "Demo agent, enables an API for a Monty Hall Simulator",

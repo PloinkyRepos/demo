@@ -1,5 +1,5 @@
 {
-    "container": "node:20-alpine",
+    "container": "node:20-bullseye",
     "cli": "node /code/main.mjs",
     "agent": "node /code/main.mjs",
     "about": "Skill manager CLI for creating, editing, validating, and testing skills via webchat. Includes file explorer integration.",
