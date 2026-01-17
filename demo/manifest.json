@@ -15,7 +15,7 @@
     "repos": {
         "vibe1": "https://github.com/PloinkyRepos/vibe.git",
         "webmeet": "https://github.com/PloinkyRepos/webmeet.git",
-        "fileExplorer": "https://github.com/PloinkyRepos/AsssistOSExplorer.git",
+        "fileExplorer": "https://github.com/PloinkyRepos/AssistOSExplorer.git",
         "soplangBuilder": "https://github.com/PloinkyRepos/SOPLangBuilder.git"
     },
     "profiles": {
