@@ -1,6 +1,5 @@
 {
     "container": "node:18-alpine",
-    "install": "echo 'This is a line' > myfile.txt",
     "update": "",
     "cli": "/bin/sh",
     "about": "Demo agent for providing static files",
@@ -19,10 +18,12 @@
         "fileExplorer": "https://github.com/PloinkyRepos/AsssistOSExplorer.git",
         "soplangBuilder": "https://github.com/PloinkyRepos/SOPLangBuilder.git"
     },
-    "env": [
-        {
-            "name": "DEMO_VAR",
-            "value": "DEMO_VALUE"
+    "profiles": {
+        "default": {
+            "env": {
+                "DEMO_VAR": "DEMO_VALUE"
+            },
+            "install": "echo 'This is a line' > myfile.txt"
         }
-    ]
+    }
 }

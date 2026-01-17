@@ -1,7 +1,11 @@
 {
-  "container": "node:18-alpine",
-  "install": "echo 'No installation needed'",
-  "update": "",
-  "cli": "/bin/sh",
-  "about": "Demo agent, enables an API for a Monty Hall Simulator"
+    "container": "node:18-alpine",
+    "update": "",
+    "cli": "/bin/sh",
+    "about": "Demo agent, enables an API for a Monty Hall Simulator",
+    "profiles": {
+        "default": {
+            "install": "echo 'No installation needed'"
+        }
+    }
 }
