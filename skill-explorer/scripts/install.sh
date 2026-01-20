@@ -3,10 +3,10 @@
 # install.sh - Skill Explorer Container Installation Script
 # ============================================================================
 # This script runs inside the container during ploinky agent installation.
-# It verifies the skill-manager built-in skills.
+# It installs npm dependencies and verifies the skill-manager built-in skills.
 #
-# NOTE: The install hook runs with /code mounted read-only.
-# Directory creation is done in postinstall.sh which runs after container start.
+# NOTE: The install hook runs in a temporary container with /code read-only.
+# npm install writes to $WORKSPACE_PATH/node_modules which gets mounted later.
 #
 # NOTE: skill-manager-skills/ directory should be included in the skill-explorer
 # source directory (copied from skill-manager-cli/skill-manager/src/.AchillesSkills)
@@ -15,6 +15,21 @@
 set -e
 
 cd /code
+
+# ============================================================================
+# Install npm dependencies
+# ============================================================================
+echo "Installing npm dependencies..."
+if [ -f "/code/package.json" ]; then
+  # Copy package.json to workspace and install there
+  cp /code/package.json "$WORKSPACE_PATH/package.json"
+  cd "$WORKSPACE_PATH"
+  npm install
+  cd /code
+  echo "npm dependencies installed to $WORKSPACE_PATH/node_modules"
+else
+  echo "No package.json found, skipping npm install"
+fi
 
 echo "============================================"
 echo "Installing skill-explorer..."
@@ -48,11 +63,12 @@ echo "  /code/skill-manager-skills/ - Built-in skills"
 echo "  /code/tools/               - MCP tool scripts"
 echo ""
 
-# Check if achillesAgentLib is available
-if [ -d "/code/node_modules/achillesAgentLib" ]; then
-  echo "achillesAgentLib: installed"
+# Check if achillesAgentLib is available (installed to WORKSPACE_PATH/node_modules)
+if [ -d "$WORKSPACE_PATH/node_modules/achillesAgentLib" ]; then
+  echo "achillesAgentLib: installed at $WORKSPACE_PATH/node_modules"
 else
   echo "achillesAgentLib: NOT FOUND (agent may not work)"
+  echo "Expected at: $WORKSPACE_PATH/node_modules/achillesAgentLib"
 fi
 
 # Count available skills

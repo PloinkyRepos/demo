@@ -5,6 +5,6 @@
   "description": "Skill manager CLI agent for ploinky webchat",
   "main": "main.mjs",
   "dependencies": {
-    "achillesAgentLib": "file:../../../coral-agent/node_modules/achillesAgentLib"
+    "achillesAgentLib": "github:OutfinityResearch/achillesAgentLib"
   }
 }
