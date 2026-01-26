@@ -32,8 +32,8 @@
                 "OPENROUTER_API_KEY",
                 "PLOINKY_ROUTER_URL"
             ],
-            "preinstall": "apt-get update && apt-get install -y git && ./scripts/preinstall.sh",
-            "install": "/code/scripts/install.sh",
+            "preinstall": "scripts/preinstall.sh",
+            "install": "apt-get update && apt-get install -y git && /code/scripts/install.sh",
             "postinstall": "/code/scripts/postinstall.sh"
         }
     }
