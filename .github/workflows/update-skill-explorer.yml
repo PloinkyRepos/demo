@@ -123,12 +123,7 @@ jobs:
 
           WORK_DIR="$HOME/$WORKSPACE"
           cd "$WORK_DIR"
-          ROUTER_PORT=$(python3 -c "import json, os; p=os.path.join('.ploinky','routing.json');\
-try:\
-    obj=json.load(open(p));\
-    print(obj.get('port') or 8080)\
-except Exception:\
-    print(8080)")
+          ROUTER_PORT=$(python3 -c "import json, os; p=os.path.join('.ploinky','routing.json'); print(((json.load(open(p)).get('port') if os.path.exists(p) else 8080) or 8080))")
           echo "[update] Restarting skill-explorer on router port $ROUTER_PORT..."
 
           ploinky stop || true
