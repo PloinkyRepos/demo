@@ -3,10 +3,15 @@
 # install.sh - Skill Explorer Container Installation Script
 # ============================================================================
 # This script runs inside the container during ploinky agent installation.
-# It installs npm dependencies and verifies the skill-manager built-in skills.
+# It verifies the filesystem layout used by skill-explorer.
 #
-# NOTE: The install hook runs in a temporary container with /code read-only.
-# npm install writes to $WORKSPACE_PATH/node_modules which gets mounted later.
+# IMPORTANT:
+# Ploinky manages Node dependencies for agents (merging global deps like `mcp-sdk`
+# with the agent's package.json) and mounts them into the runtime container.
+#
+# Do NOT run `npm install` here. Re-installing from /code/package.json would
+# overwrite the merged dependency set and can remove required runtime deps
+# (notably `mcp-sdk` needed by /Agent/server/AgentServer.mjs).
 #
 # NOTE: skill-manager-skills/ directory should be included in the skill-explorer
 # source directory (copied from skill-manager-cli/skill-manager/src/.AchillesSkills)
@@ -15,21 +20,6 @@
 set -e
 
 cd /code
-
-# ============================================================================
-# Install npm dependencies
-# ============================================================================
-echo "Installing npm dependencies..."
-if [ -f "/code/package.json" ]; then
-  # Copy package.json to workspace and install there
-  cp /code/package.json "$WORKSPACE_PATH/package.json"
-  cd "$WORKSPACE_PATH"
-  npm install
-  cd /code
-  echo "npm dependencies installed to $WORKSPACE_PATH/node_modules"
-else
-  echo "No package.json found, skipping npm install"
-fi
 
 echo "============================================"
 echo "Installing skill-explorer..."
@@ -63,12 +53,22 @@ echo "  /code/skill-manager-skills/ - Built-in skills"
 echo "  /code/tools/               - MCP tool scripts"
 echo ""
 
-# Check if achillesAgentLib is available (installed to WORKSPACE_PATH/node_modules)
-if [ -d "$WORKSPACE_PATH/node_modules/achillesAgentLib" ]; then
-  echo "achillesAgentLib: installed at $WORKSPACE_PATH/node_modules"
-else
-  echo "achillesAgentLib: NOT FOUND (agent may not work)"
-  echo "Expected at: $WORKSPACE_PATH/node_modules/achillesAgentLib"
+if [ -n "${WORKSPACE_PATH:-}" ]; then
+  # Check if achillesAgentLib is available (needed only for `ploinky cli skill-explorer`).
+  if [ -d "$WORKSPACE_PATH/node_modules/achillesAgentLib" ]; then
+    echo "achillesAgentLib: installed at $WORKSPACE_PATH/node_modules"
+  else
+    echo "achillesAgentLib: NOT FOUND (CLI may not work)"
+    echo "Expected at: $WORKSPACE_PATH/node_modules/achillesAgentLib"
+  fi
+
+  # Check if mcp-sdk is present (required by the default AgentServer runtime).
+  if [ -d "$WORKSPACE_PATH/node_modules/mcp-sdk" ]; then
+    echo "mcp-sdk: installed at $WORKSPACE_PATH/node_modules"
+  else
+    echo "mcp-sdk: NOT FOUND (MCP server will fail to start)"
+    echo "Expected at: $WORKSPACE_PATH/node_modules/mcp-sdk"
+  fi
 fi
 
 # Count available skills
