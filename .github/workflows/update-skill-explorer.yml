@@ -1,0 +1,148 @@
+name: Update Skill Explorer
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'demo repo branch to update to'
+        required: false
+        default: 'main'
+        type: string
+      update_ploinky:
+        description: 'Also update Ploinky on the remote host'
+        required: false
+        default: false
+        type: boolean
+      ploinky_branch:
+        description: 'Ploinky branch (if updating)'
+        required: false
+        default: 'master'
+        type: string
+      workspace_name:
+        description: 'Workspace directory name on the remote host'
+        required: false
+        default: 'testSkillExplorer'
+        type: string
+      restart_services:
+        description: 'Restart services after update'
+        required: false
+        default: true
+        type: boolean
+
+  push:
+    branches:
+      - main
+    paths:
+      - 'skill-explorer/**'
+      - '.github/workflows/update-skill-explorer.yml'
+
+env:
+  SSH_USER: ${{ vars.SSH_USER || 'admin' }}
+  SSH_HOST: ${{ vars.SSH_HOST || '193.180.209.191' }}
+
+jobs:
+  update:
+    name: Update on Remote Host
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch || 'main' }}
+          fetch-depth: 0
+
+      - name: Prepare SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${{ env.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Update Ploinky
+        if: ${{ inputs.update_ploinky == true }}
+        env:
+          PLOINKY_BRANCH: ${{ inputs.ploinky_branch || 'master' }}
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key "${{ env.SSH_USER }}@${{ env.SSH_HOST }}" bash -s -- "$PLOINKY_BRANCH" << 'UPDATE_PLOINKY'
+          set -euo pipefail
+          PLOINKY_BRANCH="$1"
+          PLOINKY_DIR="$HOME/ploinky"
+          if [ ! -d "$PLOINKY_DIR/.git" ]; then
+            echo "[update] Ploinky not found, skipping."
+            exit 0
+          fi
+          cd "$PLOINKY_DIR"
+          git stash 2>/dev/null || true
+          git fetch origin
+          git checkout "${PLOINKY_BRANCH:-master}"
+          git pull origin "${PLOINKY_BRANCH:-master}"
+          npm install
+          echo "[update] Ploinky updated."
+          UPDATE_PLOINKY
+
+      - name: Update demo repository
+        env:
+          WORKSPACE: ${{ inputs.workspace_name || vars.SKILL_EXPLORER_WORKSPACE || 'testSkillExplorer' }}
+          DEMO_BRANCH: ${{ inputs.branch || 'main' }}
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key "${{ env.SSH_USER }}@${{ env.SSH_HOST }}" bash -s -- "$WORKSPACE" "$DEMO_BRANCH" << 'UPDATE_DEMO'
+          set -euo pipefail
+          WORKSPACE="$1"
+          DEMO_BRANCH="$2"
+          export PATH="$HOME/ploinky/bin:$HOME/.local/bin:$PATH"
+
+          WORK_DIR="$HOME/$WORKSPACE"
+          DEMO_REPO="$WORK_DIR/.ploinky/repos/demo"
+          if [ ! -d "$DEMO_REPO/.git" ]; then
+            echo "[update] demo repo not found at $DEMO_REPO"
+            exit 1
+          fi
+
+          echo "[update] Updating demo repo to $DEMO_BRANCH..."
+          cd "$DEMO_REPO"
+          git stash 2>/dev/null || true
+          git clean -fd 2>/dev/null || true
+          git fetch origin
+          git checkout "${DEMO_BRANCH:-main}"
+          git reset --hard "origin/${DEMO_BRANCH:-main}"
+          echo "[update] demo updated to $(git rev-parse --short HEAD)"
+          UPDATE_DEMO
+
+      - name: Restart services
+        if: ${{ inputs.restart_services != false }}
+        env:
+          WORKSPACE: ${{ inputs.workspace_name || vars.SKILL_EXPLORER_WORKSPACE || 'testSkillExplorer' }}
+        run: |
+          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=10 -i ~/.ssh/deploy_key "${{ env.SSH_USER }}@${{ env.SSH_HOST }}" bash -s -- "$WORKSPACE" << 'RESTART'
+          set -euo pipefail
+          WORKSPACE="$1"
+          export PATH="$HOME/ploinky/bin:$HOME/.local/bin:$PATH"
+
+          WORK_DIR="$HOME/$WORKSPACE"
+          cd "$WORK_DIR"
+          ROUTER_PORT=$(python3 - <<'PY'
+import json
+import os
+p=os.path.join('.ploinky','routing.json')
+try:
+  obj=json.load(open(p))
+  print(obj.get('port') or 8080)
+except Exception:
+  print(8080)
+PY
+)
+          echo "[update] Restarting skill-explorer on router port $ROUTER_PORT..."
+
+          ploinky stop || true
+          nohup ploinky start skill-explorer "$ROUTER_PORT" > "$WORK_DIR/logs/update-start.log" 2>&1 &
+          sleep 10
+          echo "[update] Containers:"
+          podman ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | head -80
+          RESTART
+
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
