@@ -167,14 +167,16 @@ jobs:
           nohup ploinky start skill-explorer "$ROUTER_PORT" > "$WORK_DIR/logs/deploy-start.log" 2>&1 &
 
           echo "[deploy] Waiting for router to come up..."
+          # On a fresh deploy, `ploinky start` may need several minutes to install
+          # OS packages + npm dependencies for multiple agents.
           sleep 10
-          for i in $(seq 1 30); do
+          for i in $(seq 1 180); do
             code=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:${ROUTER_PORT}/dashboard" || true)
             if [ "$code" = "200" ] || [ "$code" = "302" ]; then
               echo "[deploy] Router is responding (HTTP $code)"
               break
             fi
-            if [ "$i" = "30" ]; then
+            if [ "$i" = "180" ]; then
               echo "[deploy] WARNING: router did not respond in time"
               tail -100 "$WORK_DIR/logs/deploy-start.log" || true
               exit 1
