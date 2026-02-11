@@ -131,6 +131,91 @@ jobs:
           echo "[deploy] Ploinky ready."
           PLOINKY
 
+      - name: Configure environment variables
+        env:
+          WORKSPACE: ${{ inputs.workspace_name || vars.SKILL_EXPLORER_WORKSPACE || 'testSkillExplorer' }}
+          # API Keys (secrets)
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          AXIOLOGIC_API_KEY: ${{ secrets.AXIOLOGIC_API_KEY }}
+          OPENAI_OPENCODE_KEY: ${{ secrets.OPENAI_OPENCODE_KEY }}
+          # LLM Provider URLs (vars)
+          OPENAI_AXIOLOGIC_KIRO_URL: ${{ vars.OPENAI_AXIOLOGIC_KIRO_URL }}
+          OPENAI_AXIOLOGIC_KIRO_KEY_ENV: ${{ vars.OPENAI_AXIOLOGIC_KIRO_KEY_ENV }}
+          ANTHROPIC_AXIOLOGIC_ANTIGRAVITY_URL: ${{ vars.ANTHROPIC_AXIOLOGIC_ANTIGRAVITY_URL }}
+          ANTHROPIC_AXIOLOGIC_ANTIGRAVITY_KEY_ENV: ${{ vars.ANTHROPIC_AXIOLOGIC_ANTIGRAVITY_KEY_ENV }}
+          OPENAI_OPENCODE_URL: ${{ vars.OPENAI_OPENCODE_URL }}
+          OPENAI_OPENAI_RESPONSES_URL: ${{ vars.OPENAI_OPENAI_RESPONSES_URL }}
+          OPENAI_OPENAI_RESPONSES_KEY_ENV: ${{ vars.OPENAI_OPENAI_RESPONSES_KEY_ENV }}
+          # Achilles agent defaults (vars)
+          ACHILLES_ORCHESTRATOR_MODE: ${{ vars.ACHILLES_ORCHESTRATOR_MODE }}
+          ACHILLES_DEFAULT_FAST_MODEL: ${{ vars.ACHILLES_DEFAULT_FAST_MODEL }}
+          ACHILLES_DEFAULT_DEEP_MODEL: ${{ vars.ACHILLES_DEFAULT_DEEP_MODEL }}
+          ACHILLES_ENABLED_FAST_MODELS: ${{ vars.ACHILLES_ENABLED_FAST_MODELS }}
+          ACHILLES_ENABLED_DEEP_MODELS: ${{ vars.ACHILLES_ENABLED_DEEP_MODELS }}
+          # LLM Model definitions (single var, semicolon-delimited KEY=VALUE pairs)
+          LLM_MODELS: ${{ vars.LLM_MODELS }}
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key "${{ env.SSH_USER }}@${{ env.SSH_HOST }}" 'bash -s' << ENVVARS
+          set -eo pipefail
+          export PATH="\$HOME/ploinky/bin:\$HOME/.local/bin:\$PATH"
+
+          WORK_DIR="\$HOME/${WORKSPACE}"
+          mkdir -p "\$WORK_DIR/.ploinky/repos"
+          cd "\$WORK_DIR"
+          echo "[deploy] Configuring environment variables..."
+
+          set_var() {
+            local name="\$1"
+            local value="\$2"
+            if [ -n "\$value" ]; then
+              ploinky var "\$name" "\$value"
+              echo "  Set \$name"
+            fi
+          }
+
+          # API Keys
+          set_var OPENAI_API_KEY "${OPENAI_API_KEY:-}"
+          set_var OPENROUTER_API_KEY "${OPENROUTER_API_KEY:-}"
+          set_var AXIOLOGIC_API_KEY "${AXIOLOGIC_API_KEY:-}"
+          set_var OPENAI_OPENCODE_KEY "${OPENAI_OPENCODE_KEY:-}"
+
+          # LLM Provider endpoints
+          set_var OPENAI_AXIOLOGIC_KIRO_URL "${OPENAI_AXIOLOGIC_KIRO_URL:-}"
+          set_var OPENAI_AXIOLOGIC_KIRO_KEY_ENV "${OPENAI_AXIOLOGIC_KIRO_KEY_ENV:-}"
+          set_var ANTHROPIC_AXIOLOGIC_ANTIGRAVITY_URL "${ANTHROPIC_AXIOLOGIC_ANTIGRAVITY_URL:-}"
+          set_var ANTHROPIC_AXIOLOGIC_ANTIGRAVITY_KEY_ENV "${ANTHROPIC_AXIOLOGIC_ANTIGRAVITY_KEY_ENV:-}"
+          set_var OPENAI_OPENCODE_URL "${OPENAI_OPENCODE_URL:-}"
+          set_var OPENAI_OPENAI_RESPONSES_URL "${OPENAI_OPENAI_RESPONSES_URL:-}"
+          set_var OPENAI_OPENAI_RESPONSES_KEY_ENV "${OPENAI_OPENAI_RESPONSES_KEY_ENV:-}"
+
+          # Achilles agent defaults
+          set_var ACHILLES_ORCHESTRATOR_MODE "${ACHILLES_ORCHESTRATOR_MODE:-}"
+          set_var ACHILLES_DEFAULT_FAST_MODEL "${ACHILLES_DEFAULT_FAST_MODEL:-}"
+          set_var ACHILLES_DEFAULT_DEEP_MODEL "${ACHILLES_DEFAULT_DEEP_MODEL:-}"
+          set_var ACHILLES_ENABLED_FAST_MODELS "${ACHILLES_ENABLED_FAST_MODELS:-}"
+          set_var ACHILLES_ENABLED_DEEP_MODELS "${ACHILLES_ENABLED_DEEP_MODELS:-}"
+
+          # LLM Model definitions (dynamically parsed from LLM_MODELS var)
+          if [ -n "${LLM_MODELS:-}" ]; then
+            IFS=';' read -ra MODEL_ENTRIES <<< "${LLM_MODELS}"
+            for entry in "\${MODEL_ENTRIES[@]}"; do
+              entry="\$(printf '%s' "\$entry" | xargs)"
+              [ -z "\$entry" ] && continue
+              model_key="\${entry%%=*}"
+              model_val="\${entry#*=}"
+              if [ -n "\$model_key" ] && [ -n "\$model_val" ]; then
+                set_var "\$model_key" "\$model_val"
+              fi
+            done
+          fi
+
+          # Misc
+          set_var ACHILLES_DISABLE_FLEXSEARCH "true"
+
+          echo "[deploy] Environment variables configured."
+          ENVVARS
+
       - name: Setup workspace and start skill-explorer
         env:
           WORKSPACE: ${{ inputs.workspace_name || vars.SKILL_EXPLORER_WORKSPACE || 'testSkillExplorer' }}
