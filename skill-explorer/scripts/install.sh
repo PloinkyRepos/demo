@@ -26,6 +26,30 @@ echo "Installing skill-explorer..."
 echo "============================================"
 
 # ============================================================================
+# Clone gitTest repository
+# ============================================================================
+GITTEST_DIR="/code/gitTest"
+if [ -d "$GITTEST_DIR/.git" ]; then
+    echo "gitTest repo already exists, pulling latest..."
+    cd "$GITTEST_DIR"
+    git pull origin main 2>/dev/null || git pull origin master 2>/dev/null || true
+    cd /code
+else
+    echo "Cloning gitTest repository..."
+    git clone https://github.com/AssistosTest/gitTest.git "$GITTEST_DIR" || {
+        echo "Warning: Failed to clone gitTest repository"
+        echo "The repo may be private or unavailable."
+    }
+fi
+
+if [ -d "$GITTEST_DIR" ]; then
+    echo "gitTest repo ready at $GITTEST_DIR"
+else
+    echo "Warning: gitTest repo not available"
+fi
+echo ""
+
+# ============================================================================
 # Verify skill-manager built-in skills
 # ============================================================================
 # The skill-manager-skills directory should already be in /code/ from the source
