@@ -58,11 +58,12 @@ jobs:
             ploinky clean 2>/dev/null || true
           fi
 
-          echo "[destroy] Removing remaining matching containers..."
-          REMAINING=$(podman ps -a --format '{{.Names}}' | grep -E 'ploinky.*(skill-explorer|explorer|soplang|multimedia|skill-manager|demo|moderator|simulator)' || true)
+          echo "[destroy] Removing remaining containers for workspace $WORKSPACE..."
+          REMAINING=$(podman ps -a --format '{{.Names}}' | grep "_${WORKSPACE}_" || true)
           if [ -n "$REMAINING" ]; then
             printf '%s\n' "$REMAINING" | while IFS= read -r C; do
               [ -z "$C" ] && continue
+              echo "[destroy]   stopping $C"
               podman stop "$C" 2>/dev/null || true
               podman rm -f "$C" 2>/dev/null || true
             done
@@ -94,8 +95,8 @@ jobs:
             rm -rf "$WORK_DIR" 2>/dev/null || true
           fi
 
-          echo "[destroy] Remaining matching containers:"
-          podman ps -a --format '{{.Names}}' | grep -E 'ploinky.*(skill-explorer|explorer|soplang|multimedia|skill-manager|demo|moderator|simulator)' || echo "[destroy] none"
+          echo "[destroy] Remaining containers for $WORKSPACE:"
+          podman ps -a --format '{{.Names}}' | grep "_${WORKSPACE}_" || echo "[destroy] none"
           echo "[destroy] Done."
           DESTROY
 

@@ -21,7 +21,7 @@ on:
       router_port:
         description: 'Router port on the remote host'
         required: false
-        default: '8080'
+        default: '8097'
         type: string
 
 env:
@@ -220,7 +220,7 @@ jobs:
         env:
           WORKSPACE: ${{ inputs.workspace_name || vars.SKILL_EXPLORER_WORKSPACE || 'testSkillExplorer' }}
           DEMO_BRANCH: ${{ inputs.branch || 'main' }}
-          ROUTER_PORT: ${{ inputs.router_port || vars.SKILL_EXPLORER_ROUTER_PORT || '8080' }}
+          ROUTER_PORT: ${{ inputs.router_port || vars.SKILL_EXPLORER_ROUTER_PORT || '8097' }}
         run: |
           ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=10 -i ~/.ssh/deploy_key "${{ env.SSH_USER }}@${{ env.SSH_HOST }}" "WORKSPACE='$WORKSPACE' DEMO_BRANCH='$DEMO_BRANCH' ROUTER_PORT='$ROUTER_PORT' bash -s" << 'DEPLOY'
           set -euo pipefail

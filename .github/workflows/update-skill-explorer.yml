@@ -23,6 +23,11 @@ on:
         required: false
         default: 'testSkillExplorer'
         type: string
+      router_port:
+        description: 'Router port on the remote host'
+        required: false
+        default: '8097'
+        type: string
       restart_services:
         description: 'Restart services after update'
         required: false
@@ -193,18 +198,19 @@ jobs:
           ENVVARS
 
       - name: Restart services
-        if: ${{ inputs.restart_services != false }}
+        if: ${{ inputs.restart_services == '' || inputs.restart_services == true }}
         env:
           WORKSPACE: ${{ inputs.workspace_name || vars.SKILL_EXPLORER_WORKSPACE || 'testSkillExplorer' }}
+          ROUTER_PORT: ${{ inputs.router_port || vars.SKILL_EXPLORER_ROUTER_PORT || '8097' }}
         run: |
-          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=10 -i ~/.ssh/deploy_key "${{ env.SSH_USER }}@${{ env.SSH_HOST }}" bash -s -- "$WORKSPACE" << 'RESTART'
+          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=10 -i ~/.ssh/deploy_key "${{ env.SSH_USER }}@${{ env.SSH_HOST }}" bash -s -- "$WORKSPACE" "$ROUTER_PORT" << 'RESTART'
           set -euo pipefail
           WORKSPACE="$1"
+          ROUTER_PORT="$2"
           export PATH="$HOME/ploinky/bin:$HOME/.local/bin:$PATH"
 
           WORK_DIR="$HOME/$WORKSPACE"
           cd "$WORK_DIR"
-          ROUTER_PORT=$(python3 -c "import json, os; p=os.path.join('.ploinky','routing.json'); print(((json.load(open(p)).get('port') if os.path.exists(p) else 8080) or 8080))")
           echo "[update] Restarting skill-explorer on router port $ROUTER_PORT..."
 
           ploinky stop || true
