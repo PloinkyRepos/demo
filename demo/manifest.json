@@ -24,7 +24,7 @@
             "env": {
                 "DEMO_VAR": "DEMO_VALUE"
             },
-            "install": "echo 'This is a line' > myfile.txt"
+            "install": "echo 'This is a line' > \"${WORKSPACE_PATH:-/tmp}/myfile.txt\""
         }
     }
 }
