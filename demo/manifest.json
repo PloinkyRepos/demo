@@ -1,4 +1,5 @@
 {
+    "lite-sandbox": true,
     "container": "node:18-bullseye",
     "update": "",
     "cli": "/bin/sh",
